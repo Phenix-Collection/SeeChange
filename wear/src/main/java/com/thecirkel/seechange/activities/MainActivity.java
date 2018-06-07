@@ -1,8 +1,10 @@
-package com.thecirkel.seechange;
+package com.thecirkel.seechange.activities;
 
 import android.os.Bundle;
 import android.support.wearable.activity.WearableActivity;
 import android.widget.TextView;
+
+import com.thecirkel.seechange.R;
 
 public class MainActivity extends WearableActivity {
 
@@ -13,7 +15,7 @@ public class MainActivity extends WearableActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextView = (TextView) findViewById(R.id.text);
+        mTextView = findViewById(R.id.text);
 
         // Enables Always-on
         setAmbientEnabled();
