@@ -1,4 +1,4 @@
-package com.thecirkel.seechange;
+package com.thecirkel.seechangemodels;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.thecirkel.seechange", appContext.getPackageName());
+        assertEquals("com.thecirkel.seechangemodels.test", appContext.getPackageName());
     }
 }
