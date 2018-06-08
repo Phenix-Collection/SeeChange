@@ -41,16 +41,21 @@ public class CameraActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_main);
+        //surface view for preview
         SurfaceView surfaceView = findViewById(R.id.surfaceView);
+        //start/stop button
         button = findViewById(R.id.b_start_stop);
         button.setOnClickListener(this);
+        //switch camera button
         Button switchCamera = findViewById(R.id.switch_camera);
         switchCamera.setOnClickListener(this);
+        //rtmp library needs surfaceview
         rtmpCamera1 = new RtmpCamera1(surfaceView, this);
         surfaceView.getHolder().addCallback(this);
     }
 
     @Override
+    //connection succes toast
     public void onConnectionSuccessRtmp() {
         runOnUiThread(new Runnable() {
             @Override
@@ -61,6 +66,7 @@ public class CameraActivity extends AppCompatActivity
     }
 
     @Override
+    //connection error toast
     public void onConnectionFailedRtmp(final String reason) {
         runOnUiThread(new Runnable() {
             @Override
@@ -74,6 +80,7 @@ public class CameraActivity extends AppCompatActivity
     }
 
     @Override
+    //disconnection toast
     public void onDisconnectRtmp() {
         runOnUiThread(new Runnable() {
             @Override
@@ -84,6 +91,7 @@ public class CameraActivity extends AppCompatActivity
     }
 
     @Override
+    //authentication error toast
     public void onAuthErrorRtmp() {
         runOnUiThread(new Runnable() {
             @Override
@@ -94,6 +102,7 @@ public class CameraActivity extends AppCompatActivity
     }
 
     @Override
+    //authenticatie succes toast
     public void onAuthSuccessRtmp() {
         runOnUiThread(new Runnable() {
             @Override
@@ -104,26 +113,34 @@ public class CameraActivity extends AppCompatActivity
     }
 
     @Override
+    //onclick
     public void onClick(View view) {
         switch (view.getId()) {
+            //start or stop button
             case R.id.b_start_stop:
                 if (!rtmpCamera1.isStreaming()) {
                     if (rtmpCamera1.isRecording()
                             || rtmpCamera1.prepareAudio() && rtmpCamera1.prepareVideo()) {
+                        //if streaming button is called stop
                         button.setText(R.string.stop_button);
+                        //authorization
                         rtmpCamera1.setAuthorization("","");
+                        //endpoint hardcoded
                         rtmpCamera1.startStream("rtmp://live-ams.twitch.tv/app/live_229618731_AUvc24gV8uYsDyrNZz1a6QSDWkIIEX");
                     } else {
                         Toast.makeText(this, "Error preparing stream, This device cant do it",
                                 Toast.LENGTH_SHORT).show();
                     }
                 } else {
+                    //if not streaming button is called start
                     button.setText(R.string.start_button);
                     rtmpCamera1.stopStream();
                 }
                 break;
+                //switch camera button
             case R.id.switch_camera:
                 try {
+                    //simple method for switching camera(may break stream because mobile does not work propperly)
                     rtmpCamera1.switchCamera();
                 } catch (CameraOpenException e) {
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -145,6 +162,7 @@ public class CameraActivity extends AppCompatActivity
     }
 
     @Override
+    //stop using app stop streaming/recording
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2 && rtmpCamera1.isRecording()) {
             rtmpCamera1.stopRecord();
