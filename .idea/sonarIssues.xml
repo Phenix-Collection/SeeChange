@@ -3,6 +3,11 @@
   <component name="issues">
     <option name="index">
       <map>
+        <entry key="/Dummy.txt">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="/fragment.java">
           <value>
             <set />
@@ -18,7 +23,32 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/activities/ChatActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/activities/MainActivity.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/adapters/ChatArrayAdapter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/services/ChatObserverService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/services/ChatService.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/res/layout/activity_chat.xml">
           <value>
             <set />
           </value>
@@ -28,7 +58,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/res/layout/chatitem.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/seechangemodels/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/seechangemodels/src/main/java/com/thecirkel/seechangemodels/ChatMessage.java">
           <value>
             <set />
           </value>
