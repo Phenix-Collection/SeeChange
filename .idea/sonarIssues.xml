@@ -78,6 +78,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/seechangemodels/src/main/java/com/thecirkel/seechangemodels/models/ChatMessage.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/seechangemodels/src/main/java/com/thecirkel/seechangemodels/models/Static.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/wear/build.gradle">
           <value>
             <set />
@@ -93,7 +103,17 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/wear/src/main/java/com/thecirkel/seechange/fragments/FollowCounterFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/wear/src/main/res/layout/activity_main.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/wear/src/main/res/layout/follow_counter.xml">
           <value>
             <set />
           </value>

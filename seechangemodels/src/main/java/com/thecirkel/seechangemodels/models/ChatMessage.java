@@ -1,6 +1,8 @@
 package com.thecirkel.seechangemodels.models;
 
-public class ChatMessage {
+import java.io.Serializable;
+
+public class ChatMessage implements Serializable {
     private String message;
     private String username;
 

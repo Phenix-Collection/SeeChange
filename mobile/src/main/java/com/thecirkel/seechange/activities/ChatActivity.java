@@ -18,19 +18,16 @@ public class ChatActivity extends AppCompatActivity implements Observer{
     private List<ChatMessage> chatList;
     private ChatArrayAdapter arrayAdapter;
 
-    private ChatService chatService = ChatService.getInstance();
+    private ChatService chatService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+        chatService = ChatService.getInstance(this);
 
-        getFirstMessages();
-
-        chatListView = findViewById(R.id.ChatList);
-        arrayAdapter = new ChatArrayAdapter(this, chatList);
-
-        chatListView.setAdapter(arrayAdapter);
+        initMessages();
+        initListView();
 
         chatService.addObserver(this);
         chatService.start();
@@ -41,7 +38,13 @@ public class ChatActivity extends AppCompatActivity implements Observer{
         arrayAdapter.notifyDataSetChanged();
     }
 
-    private void getFirstMessages() {
+    private void initMessages() {
         chatList = this.chatService.getMessages();
+    }
+
+    private void initListView() {
+        chatListView = findViewById(R.id.ChatList);
+        arrayAdapter = new ChatArrayAdapter(this, chatList);
+        chatListView.setAdapter(arrayAdapter);
     }
 }
