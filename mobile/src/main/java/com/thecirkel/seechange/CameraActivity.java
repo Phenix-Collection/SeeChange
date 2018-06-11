@@ -9,23 +9,15 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
+
 import com.pedro.encoder.input.video.CameraOpenException;
-import com.thecirkel.seechange.R;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
-/**
- * More documentation see:
- * {@link com.pedro.rtplibrary.base.Camera1Base}
- * {@link com.pedro.rtplibrary.rtmp.RtmpCamera1}
- */
+import java.io.File;
+
 public class CameraActivity extends AppCompatActivity
         implements ConnectCheckerRtmp, View.OnClickListener, SurfaceHolder.Callback {
 
