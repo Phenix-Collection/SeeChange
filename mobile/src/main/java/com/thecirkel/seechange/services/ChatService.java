@@ -27,8 +27,6 @@ public class ChatService extends Observable {
     private boolean firstSend = false;
     private boolean lastSend = false;
 
-    private boolean isRunning = false;
-
     private DataClient dataClient;
 
     protected ChatService(Context context) {
@@ -42,13 +40,13 @@ public class ChatService extends Observable {
     }
 
     public static ChatService getInstance(Context context) {
-        instance = new ChatService(context);
+        if (instance == null) {
+            instance = new ChatService(context);
+        }
         return instance;
     }
 
     public void start() {
-
-        isRunning = true;
 
         if (!firstSend) {
             Handler handler = new Handler();
@@ -82,16 +80,8 @@ public class ChatService extends Observable {
         }
     }
 
-    public void stop() {
-        isRunning = false;
-    }
-
     public List<ChatMessage> getMessages() {
         return messages;
-    }
-
-    public boolean isRunning() {
-        return isRunning;
     }
 
     private void addMessage(ChatMessage chatMessage) {
