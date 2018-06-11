@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SeeChange</string>
+    
+    <string name="icon_eye">&#xf06e;</string>
 </resources>
