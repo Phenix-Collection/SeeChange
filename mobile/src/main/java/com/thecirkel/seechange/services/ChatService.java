@@ -27,21 +27,28 @@ public class ChatService extends Observable {
     private boolean firstSend = false;
     private boolean lastSend = false;
 
+    private boolean isRunning = false;
+
     private DataClient dataClient;
 
     protected ChatService(Context context) {
-        dataClient = Wearable.getDataClient(context);
-        addMessage(new ChatMessage("Deze stream is echt sick!", "Bart in 't Veld"));
+        if (context != null) {
+            dataClient = Wearable.getDataClient(context);
+        } else {
+            dataClient = null;
+        }
+
+        addMessage(new ChatMessage("Mooie stream!", "Bart in 't Veld"));
     }
 
     public static ChatService getInstance(Context context) {
-        if (instance == null) {
-            instance = new ChatService(context);
-        }
+        instance = new ChatService(context);
         return instance;
     }
 
     public void start() {
+
+        isRunning = true;
 
         if (!firstSend) {
             Handler handler = new Handler();
@@ -75,28 +82,37 @@ public class ChatService extends Observable {
         }
     }
 
+    public void stop() {
+        isRunning = false;
+    }
+
     public List<ChatMessage> getMessages() {
         return messages;
+    }
+
+    public boolean isRunning() {
+        return isRunning;
     }
 
     private void addMessage(ChatMessage chatMessage) {
         this.messages.add(chatMessage);
 
         try {
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-            objectOutputStream.writeObject(chatMessage);
+            if (dataClient != null) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+                objectOutputStream.writeObject(chatMessage);
 
-            byte[] bytes = byteArrayOutputStream.toByteArray();
+                byte[] bytes = byteArrayOutputStream.toByteArray();
 
-            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Static.CHATMAP);
-            putDataMapRequest.getDataMap().putByteArray(Static.CHATKEY, bytes);
+                PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(Static.CHATMAP);
+                putDataMapRequest.getDataMap().putByteArray(Static.CHATKEY, bytes);
 
-            PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
-            putDataRequest.setUrgent();
-            dataClient.putDataItem(putDataRequest);
-        }
-        catch (Exception e) {
+                PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+                putDataRequest.setUrgent();
+                dataClient.putDataItem(putDataRequest);
+            }
+        } catch (Exception e) {
 
         }
     }

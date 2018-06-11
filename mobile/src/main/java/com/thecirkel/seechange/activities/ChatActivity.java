@@ -24,7 +24,7 @@ public class ChatActivity extends AppCompatActivity implements Observer{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-        chatService = ChatService.getInstance(this);
+        chatService = ChatService.getInstance(getApplication());
 
         initMessages();
         initListView();
