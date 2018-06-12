@@ -118,7 +118,7 @@ public class CameraActivity extends AppCompatActivity
                         //authorization
                         rtmpCamera1.setAuthorization("","");
                         //endpoint hardcoded
-                        rtmpCamera1.startStream("rtmp://live-ams.twitch.tv/app/live_229618731_AUvc24gV8uYsDyrNZz1a6QSDWkIIEX");
+                        rtmpCamera1.startStream("rtmp://188.166.127.54/play/test");
                     } else {
                         Toast.makeText(this, "Error preparing stream, This device cant do it",
                                 Toast.LENGTH_SHORT).show();

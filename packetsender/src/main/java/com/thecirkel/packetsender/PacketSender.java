@@ -46,6 +46,9 @@ public class PacketSender {
             mac.init(key);
             socket = IO.socket("http://188.166.127.54:3000");
             socket.connect();
+
+            sendPublicKey(PUBLICKEY);
+
         } catch (NoSuchAlgorithmException e) {
 
         } catch (InvalidKeyException e) {
@@ -82,6 +85,7 @@ public class PacketSender {
             counter = 0;
             addPacket(newPacket);
             final byte[] hash = mac.doFinal(packets);
+            sendPacketsToServer(packets);
             sendToServer(toHexString(hash));
 
         } else {
@@ -90,9 +94,17 @@ public class PacketSender {
         }
     }
 
+    private void sendPublicKey(String key) {
+        socket.emit("publickey", key);
+    }
+
     private void sendToServer(String hash) {
         packets = null;
         socket.emit("packetpack", hash);
+    }
+
+    private void sendPacketsToServer(byte[] bytes) {
+        socket.emit("packetpack2", bytes);
     }
 
     private static String toHexString(byte[] bytes) {
