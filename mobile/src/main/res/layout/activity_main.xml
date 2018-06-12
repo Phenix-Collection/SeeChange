@@ -6,11 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <fragment android:name="com.thecirkel.seechange.ChatFragment"
+        android:id="@+id/fragment_container"
+        android:layout_alignRight="@id/surfaceView"
+        android:layout_width="300dp"
+        android:layout_height="match_parent" />
+
     <SurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/surfaceView"
         />
+
+
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -36,5 +44,14 @@
             android:id="@+id/switch_camera"
             />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/chat_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="0dp"
+        android:text="Chat" />
 
 </RelativeLayout>

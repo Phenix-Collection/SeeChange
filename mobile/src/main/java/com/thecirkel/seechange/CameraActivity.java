@@ -1,24 +1,34 @@
 package com.thecirkel.seechange;
 
+import android.support.v4.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 import com.pedro.encoder.input.video.CameraOpenException;
-import com.thecirkel.seechange.R;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.io.InputStream;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 /**
@@ -49,9 +59,36 @@ public class CameraActivity extends AppCompatActivity
         //switch camera button
         Button switchCamera = findViewById(R.id.switch_camera);
         switchCamera.setOnClickListener(this);
+        //chat button starts new activity
+        Button ChatActivity = findViewById(R.id.chat_button);
+        ChatActivity.setOnClickListener(this);
         //rtmp library needs surfaceview
         rtmpCamera1 = new RtmpCamera1(surfaceView, this);
         surfaceView.getHolder().addCallback(this);
+
+        Button backbutton = findViewById(R.id.back_button);
+        backbutton.setOnClickListener(this);
+
+        //certificate reading out sd storage
+        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+
+        try {
+            InputStream is = new FileInputStream(certificateFile);
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            X509Certificate caCert = (X509Certificate)cf.generateCertificate(is);
+
+            PublicKey key = caCert.getPublicKey();
+
+            System.out.println("public key : ");
+            System.out.println(key);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -126,7 +163,8 @@ public class CameraActivity extends AppCompatActivity
                         //authorization
                         rtmpCamera1.setAuthorization("","");
                         //endpoint hardcoded
-                        rtmpCamera1.startStream("rtmp://live-ams.twitch.tv/app/live_229618731_AUvc24gV8uYsDyrNZz1a6QSDWkIIEX");
+                        rtmpCamera1.startStream("rtmp://188.166.127.54/live/test");
+                                //"rtmp://live-ams.twitch.tv/app/live_229618731_AUvc24gV8uYsDyrNZz1a6QSDWkIIEX");
                     } else {
                         Toast.makeText(this, "Error preparing stream, This device cant do it",
                                 Toast.LENGTH_SHORT).show();
@@ -144,6 +182,23 @@ public class CameraActivity extends AppCompatActivity
                     rtmpCamera1.switchCamera();
                 } catch (CameraOpenException e) {
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.chat_button:
+                try{
+                    // Create new fragment and transaction
+                    ChatFragment newFragment = new ChatFragment();
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                    // Replace whatever is in the fragment_container view with this fragment,
+                    // and add the transaction to the back stack
+                    transaction.replace(R.id.fragment_container, newFragment);
+                    transaction.addToBackStack(null);
+
+                    // Commit the transaction
+                    transaction.commit();
+                }catch (ActivityNotFoundException e){
+
                 }
                 break;
             default:
