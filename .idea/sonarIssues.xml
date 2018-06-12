@@ -68,6 +68,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/res/values/styles.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/test/java/com/thecirkel/seechange/ChatServiceTest.java">
           <value>
             <set />
