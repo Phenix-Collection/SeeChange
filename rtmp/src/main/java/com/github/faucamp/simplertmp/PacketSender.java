@@ -1,5 +1,8 @@
-package com.thecirkel.packetsender;
+package com.github.faucamp.simplertmp;
 
+import android.util.Log;
+
+import com.github.faucamp.simplertmp.packets.RtmpPacket;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -37,6 +40,8 @@ public class PacketSender {
     private Socket socket;
 
     private byte[] packets;
+    private int hunderdCounter = 0;
+
     private int counter = 0;
 
     protected PacketSender() {
@@ -80,38 +85,24 @@ public class PacketSender {
         }
     }
 
-    public void startSending(byte[] newPacket) {
-        sendPacket(newPacket);
-
-        if (counter == 100) {
-            counter = 0;
-            addPacket(newPacket);
-            final byte[] hash = mac.doFinal(packets);
-            sendPacketsToServer(packets);
-            sendToServer(toHexString(hash));
-
-        } else {
-            addPacket(newPacket);
-            counter++;
-        }
+    public void startSending(byte[] newPacket, RtmpPacket packet) {
+        final byte[] hash = mac.doFinal(newPacket);
+        sendToServer(toHexString(hash), packet);
     }
 
     private void sendPublicKey(String key) {
         socket.emit("publickey", key);
     }
 
-    private void sendToServer(String hash) {
+    private void sendToServer(String hash, RtmpPacket packet) {
         packets = null;
-        socket.emit("packetpack", hash);
+        socket.emit("packet", "{" +
+                " \"hash\": \"" + hash +
+                "\", \"messageType\": \"" + packet.getHeader().getMessageType() +
+                "\", \"absoluteMadTime\": " + packet.getHeader().getAbsoluteTimestamp()+
+                "}");
     }
 
-    private void sendPacketsToServer(byte[] bytes) {
-        socket.emit("packetpack2", bytes);
-    }
-
-    private void sendPacket(byte[] bytes) {
-        socket.emit("packet", bytes);
-    }
 
     private static String toHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);

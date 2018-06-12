@@ -61,6 +61,14 @@ public class ChunkStreamInfo {
     return System.nanoTime() / 1000000 - sessionBeginTimestamp;
   }
 
+  public long getTimeStamp() {
+    return realLastTimestamp;
+  }
+
+  public long getSessionBeginTimestamp() {
+    return sessionBeginTimestamp;
+  }
+
   /** Utility method for calculating & synchronizing transmitted timestamp deltas */
   public long markDeltaTimestampTx() {
     long currentTimestamp = System.nanoTime() / 1000000;

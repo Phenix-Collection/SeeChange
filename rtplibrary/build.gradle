@@ -23,4 +23,5 @@ dependencies {
   api project(':encoder')
   api project(':rtmp')
   api project(':rtsp')
+  implementation 'com.github.nkzawa:socket.io-client:0.3.0'
 }
