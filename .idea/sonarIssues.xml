@@ -23,6 +23,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/AndroidManifest.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/MainActivity.java">
           <value>
             <set />
@@ -74,6 +79,16 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/mobile/src/test/java/com/thecirkel/seechange/ChatServiceTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/packetsender/src/main/java/com/thecirkel/packetsender/PacketSender.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/packets/RtmpPacket.java">
           <value>
             <set />
           </value>

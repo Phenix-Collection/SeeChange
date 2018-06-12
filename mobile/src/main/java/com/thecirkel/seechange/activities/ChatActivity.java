@@ -1,7 +1,12 @@
 package com.thecirkel.seechange.activities;
 
+import android.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.thecirkel.seechange.R;
@@ -11,7 +16,7 @@ import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import java.util.*;
 
-public class ChatActivity extends AppCompatActivity implements Observer{
+public class ChatActivity extends Fragment implements Observer{
 
     private ListView chatListView;
 
@@ -21,16 +26,22 @@ public class ChatActivity extends AppCompatActivity implements Observer{
     private ChatService chatService;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
-        chatService = ChatService.getInstance(getApplication());
-
-        initMessages();
-        initListView();
-
+        chatService = ChatService.getInstance(getContext());
         chatService.addObserver(this);
         chatService.start();
+    }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.activity_chat, container, false);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initMessages();
+        initListView();
     }
 
     @Override
@@ -43,8 +54,8 @@ public class ChatActivity extends AppCompatActivity implements Observer{
     }
 
     private void initListView() {
-        chatListView = findViewById(R.id.ChatList);
-        arrayAdapter = new ChatArrayAdapter(this, chatList);
+        chatListView = getView().findViewById(R.id.ChatList);
+        arrayAdapter = new ChatArrayAdapter(getContext(), chatList);
         chatListView.setAdapter(arrayAdapter);
     }
 }

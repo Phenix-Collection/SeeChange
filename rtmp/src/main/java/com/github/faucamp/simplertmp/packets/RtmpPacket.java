@@ -39,8 +39,8 @@ public abstract class RtmpPacket {
         writeBody(baos);
         byte[] body = this instanceof ContentData ? array() : baos.toByteArray();
 
-        PacketSender packetSender = PacketSender.getInstance();
-        packetSender.startSending(this instanceof ContentData ? array() : baos.toByteArray());
+//        PacketSender packetSender = PacketSender.getInstance();
+//        packetSender.startSending(this instanceof ContentData ? array() : baos.toByteArray());
 
         int length = this instanceof ContentData ? size() : body.length;
         header.setPacketLength(length);

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.AppOpsManagerCompat;
 import android.support.wearable.activity.WearableActivity;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -103,5 +104,8 @@ public class MainActivity extends WearableActivity implements DataClient.OnDataC
     private void updateMessageUI(ChatMessage chatMessage) {
         username.setText(chatMessage.getUsername());
         message.setText(chatMessage.getMessage());
+    }
+
+    public void goToChat(View view) {
     }
 }
