@@ -39,8 +39,11 @@ public abstract class RtmpPacket {
         writeBody(baos);
         byte[] body = this instanceof ContentData ? array() : baos.toByteArray();
 
-        PacketSender packetSender = PacketSender.getInstance();
-        packetSender.startSending(this instanceof ContentData ? array() : baos.toByteArray());
+        if (header.getMessageType() == RtmpHeader.MessageType.AUDIO || header.getMessageType() == RtmpHeader.MessageType.VIDEO) {
+//            PacketSender packetSender = PacketSender.getInstance();
+//            packetSender.startSending(body);
+        }
+
 
         int length = this instanceof ContentData ? size() : body.length;
         header.setPacketLength(length);

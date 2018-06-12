@@ -3,6 +3,8 @@ package com.github.faucamp.simplertmp;
 import android.util.Log;
 
 import com.github.faucamp.simplertmp.io.RtmpConnection;
+import com.thecirkel.packetsender.PacketSender;
+
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 /**
@@ -35,7 +37,8 @@ public class DefaultRtmpPublisher implements RtmpPublisher {
 
   @Override
   public void publishVideoData(byte[] data, int size, int dts) {
-    Log.i("STREAM DATA", data.toString());
+    PacketSender packetSender = PacketSender.getInstance();
+    packetSender.startSending(data);
     rtmpConnection.publishVideoData(data, size, dts);
   }
 
