@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
     }
 
+    
+
     public void goToChat(View v) {
         Intent intent = new Intent(this, ChatActivity.class);
         startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());

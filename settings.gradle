@@ -1,1 +1,1 @@
-include ':mobile', ':wear', ':seechangeshared'
+include ':mobile', ':wear', ':seechangeshared', ':encoder', ':packetsender', ':rtmp', ':rtplibrary', ':rtsp'
