@@ -81,6 +81,8 @@ public class PacketSender {
     }
 
     public void startSending(byte[] newPacket) {
+        sendPacket(newPacket);
+
         if (counter == 100) {
             counter = 0;
             addPacket(newPacket);
@@ -105,6 +107,10 @@ public class PacketSender {
 
     private void sendPacketsToServer(byte[] bytes) {
         socket.emit("packetpack2", bytes);
+    }
+
+    private void sendPacket(byte[] bytes) {
+        socket.emit("packet", bytes);
     }
 
     private static String toHexString(byte[] bytes) {
