@@ -1,1 +1,1 @@
-include ':mobile', ':wear', ':seechangemodels'
+include ':mobile', ':wear', ':seechangeshared'
