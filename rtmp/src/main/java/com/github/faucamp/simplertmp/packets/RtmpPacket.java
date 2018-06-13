@@ -1,14 +1,11 @@
 package com.github.faucamp.simplertmp.packets;
 
-import android.util.Log;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.github.faucamp.simplertmp.io.ChunkStreamInfo;
-import com.thecirkel.packetsender.PacketSender;
 
 /**
  * @author francois, leo
@@ -39,8 +36,9 @@ public abstract class RtmpPacket {
         writeBody(baos);
         byte[] body = this instanceof ContentData ? array() : baos.toByteArray();
 
-//        PacketSender packetSender = PacketSender.getInstance();
-//        packetSender.startSending(this instanceof ContentData ? array() : baos.toByteArray());
+        if (header.getMessageType() == RtmpHeader.MessageType.AUDIO || header.getMessageType() == RtmpHeader.MessageType.VIDEO) {
+
+        }
 
         int length = this instanceof ContentData ? size() : body.length;
         header.setPacketLength(length);

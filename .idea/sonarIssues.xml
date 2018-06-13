@@ -98,6 +98,16 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/PacketSender.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/io/RtmpConnection.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/packets/RtmpPacket.java">
           <value>
             <set />

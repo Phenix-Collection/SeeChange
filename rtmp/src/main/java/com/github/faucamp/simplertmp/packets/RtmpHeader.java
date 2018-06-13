@@ -410,4 +410,19 @@ public class RtmpHeader {
   public void setPacketLength(int packetLength) {
     this.packetLength = packetLength;
   }
+
+  @Override
+  public String toString() {
+
+    String string =
+//            "ChunkStreamId:" + getChunkStreamId() + "\n" +
+//            "MessageStreamId:" + getMessageStreamId() + "\n" +
+            "{ messageType:" + getMessageType().getValue() +
+            "absoluteMadTime:" + getAbsoluteTimestamp() + "}" ;
+//            "TimestampDelta:" + getTimestampDelta() + "\n" +
+//            "PacketLength:" + getPacketLength() + "\n" +
+//            "ChunkType:" + getChunkType().getValue() + "\n";
+
+    return string;
+  }
 }

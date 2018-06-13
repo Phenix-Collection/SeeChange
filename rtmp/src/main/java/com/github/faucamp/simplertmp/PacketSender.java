@@ -1,15 +1,28 @@
-package com.thecirkel.packetsender;
+package com.github.faucamp.simplertmp;
 
+import android.util.Base64;
+
+import com.github.faucamp.simplertmp.packets.RtmpPacket;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Formatter;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 public class PacketSender {
@@ -36,17 +49,13 @@ public class PacketSender {
     private Key key;
     private Socket socket;
 
-    private byte[] packets;
-    private int counter = 0;
-
     protected PacketSender() {
         try {
-            key = new SecretKeySpec(PRIVATEKEY.getBytes(), "HmacSHA256");
+            key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
             socket = IO.socket("http://188.166.127.54:3000");
             socket.connect();
-
             sendPublicKey(PUBLICKEY);
 
         } catch (NoSuchAlgorithmException e) {
@@ -65,49 +74,46 @@ public class PacketSender {
         return instance;
     }
 
-    private void addPacket(byte[] newPackets) {
-        if (packets != null) {
-            try {
-                byte[] destination = new byte[packets.length + newPackets.length];
-                System.arraycopy(packets, 0, destination, 0, packets.length);
-                System.arraycopy(newPackets, 0, destination, packets.length, newPackets.length);
-                packets = destination;
-            } catch (Exception e) {
-
-            }
-        } else {
-            packets = newPackets;
-        }
-    }
-
-    public void startSending(byte[] newPacket) {
-        if (counter == 100) {
-            counter = 0;
-            addPacket(newPacket);
-            final byte[] hash = mac.doFinal(packets);
-            sendPacketsToServer(packets);
-            sendToServer(toHexString(hash));
-
-        } else {
-            addPacket(newPacket);
-            counter++;
-        }
+    public void startSending(byte[] newPacket, RtmpPacket packet) {
+        final byte[] hash = mac.doFinal(newPacket);
+        sendToServer(encrypt(hash), packet);
     }
 
     private void sendPublicKey(String key) {
         socket.emit("publickey", key);
     }
 
-    private void sendToServer(String hash) {
-        packets = null;
-        socket.emit("packetpack", hash);
+    private void sendToServer(String digitalSignature, RtmpPacket packet) {
+        socket.emit("packet", "{" +
+                " \"digitalSignature\": \"" + digitalSignature +
+                "\", \"messageType\": \"" + packet.getHeader().getMessageType() +
+                "\", \"absoluteMadTime\": " + packet.getHeader().getAbsoluteTimestamp()+
+                "}");
     }
 
-    private void sendPacketsToServer(byte[] bytes) {
-        socket.emit("packetpack2", bytes);
+    static String encrypt(byte[] data)
+    {
+        String encoded = "";
+        byte[] encrypted;
+        try {
+            byte[] privateBytes = Base64.decode(PRIVATEKEY, Base64.DEFAULT);
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(privateBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+            encrypted = cipher.doFinal(data);
+            encoded = toEncryptedHexString(encrypted);
+            return encoded;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return encoded;
     }
 
-    private static String toHexString(byte[] bytes) {
+
+    private static String toEncryptedHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
 
         Formatter formatter = new Formatter(sb);

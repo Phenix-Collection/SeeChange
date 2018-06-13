@@ -1,8 +1,7 @@
 package com.github.faucamp.simplertmp;
 
-import android.util.Log;
-
 import com.github.faucamp.simplertmp.io.RtmpConnection;
+
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 /**
@@ -35,7 +34,6 @@ public class DefaultRtmpPublisher implements RtmpPublisher {
 
   @Override
   public void publishVideoData(byte[] data, int size, int dts) {
-    Log.i("STREAM DATA", data.toString());
     rtmpConnection.publishVideoData(data, size, dts);
   }
 

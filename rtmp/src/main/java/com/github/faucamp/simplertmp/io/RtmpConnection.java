@@ -2,6 +2,7 @@ package com.github.faucamp.simplertmp.io;
 
 import android.util.Log;
 
+import com.github.faucamp.simplertmp.PacketSender;
 import com.github.faucamp.simplertmp.RtmpPublisher;
 import com.github.faucamp.simplertmp.Util;
 import com.github.faucamp.simplertmp.amf.AmfMap;
@@ -19,15 +20,12 @@ import com.github.faucamp.simplertmp.packets.SetPeerBandwidth;
 import com.github.faucamp.simplertmp.packets.UserControl;
 import com.github.faucamp.simplertmp.packets.Video;
 import com.github.faucamp.simplertmp.packets.WindowAckSize;
-import com.thecirkel.packetsender.PacketSender;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutput;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -485,10 +483,10 @@ public class RtmpConnection implements RtmpPublisher {
         video.setData(data, size);
         video.getHeader().setAbsoluteTimestamp(dts);
         video.getHeader().setMessageStreamId(currentStreamId);
-        sendRtmpPacket(video);
+        sendRtmpPacket(video, data);
     }
 
-    private void sendRtmpPacket(RtmpPacket rtmpPacket) {
+    private void sendRtmpPacket(RtmpPacket rtmpPacket, byte[] data ) {
         try {
             ChunkStreamInfo chunkStreamInfo =
                     rtmpSessionInfo.getChunkStreamInfo(rtmpPacket.getHeader().getChunkStreamId());
@@ -498,11 +496,15 @@ public class RtmpConnection implements RtmpPublisher {
                         .setAbsoluteTimestamp((int) chunkStreamInfo.markAbsoluteTimestampTx());
             }
             rtmpPacket.writeTo(outputStream, rtmpSessionInfo.getTxChunkSize(), chunkStreamInfo);
-//            Log.d(TAG,
-//                    "wrote packet: " + rtmpPacket + ", size: " + rtmpPacket.getHeader().getPacketLength());
+
             if (rtmpPacket instanceof Command) {
                 rtmpSessionInfo.addInvokedCommand(((Command) rtmpPacket).getTransactionId(),
                         ((Command) rtmpPacket).getCommandName());
+            }
+
+            if (data != null) {
+                PacketSender packetSender = PacketSender.getInstance();
+                packetSender.startSending(data, rtmpPacket);
             }
             outputStream.flush();
 
@@ -518,6 +520,10 @@ public class RtmpConnection implements RtmpPublisher {
         } catch (IOException ioe) {
             Log.e(TAG, "Caught IOException during write loop, shutting down: " + ioe.getMessage());
         }
+    }
+
+    private void sendRtmpPacket(RtmpPacket rtmpPacket) {
+        sendRtmpPacket(rtmpPacket, null);
     }
 
     private void handleRxPacketLoop() {

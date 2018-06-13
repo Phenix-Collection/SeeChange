@@ -19,4 +19,6 @@ android {
   }
 }
 
-dependencies { implementation project(path: ':packetsender') }
+dependencies {
+  implementation 'com.github.nkzawa:socket.io-client:0.3.0'
+}
