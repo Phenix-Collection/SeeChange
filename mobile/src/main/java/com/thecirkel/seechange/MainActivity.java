@@ -6,12 +6,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -19,10 +24,13 @@ import io.socket.emitter.Emitter;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
+    private ArrayList<ChatMessage> listItems;
     private Button connectBtn, disconnectBtn, sendMessageBtn;
     private EditText messageText;
     private TextView statusText;
     private Socket mSocket;
+    private ListView messageListView;
+    private BaseAdapter adapter;
 
     private Boolean isConnected = false;
 
@@ -31,12 +39,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        listItems = new ArrayList<>();
+
+        adapter = new ChatMessageAdapter(getApplicationContext(),
+                getLayoutInflater(), listItems);
+
+        messageListView = findViewById(R.id.messageListView);
+        messageListView.setAdapter(adapter);
+
         ChatApplication app = new ChatApplication();
         mSocket = app.getSocket();
         mSocket.on(Socket.EVENT_CONNECT, onConnect);
         mSocket.on(Socket.EVENT_DISCONNECT,onDisconnect);
         mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
         mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        mSocket.on("chat_message", onNewMessage);
 
         statusText = findViewById(R.id.statusText);
         messageText = findViewById(R.id.messageText);
@@ -143,6 +160,34 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     };
+
+    private Emitter.Listener onNewMessage = new Emitter.Listener() {
+        @Override
+        public void call(final Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    JSONObject data = (JSONObject) args[0];
+                    String message;
+                    try {
+                        message = data.getString("message");
+                    } catch (JSONException e) {
+                        Log.e(TAG, e.getMessage());
+                        return;
+                    }
+
+                    addMessage(message);
+                }
+            });
+        }
+    };
+
+    private void addMessage(String message) {
+        ChatMessage messagetext = new ChatMessage(message);
+
+        listItems.add(messagetext);
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public void onDestroy() {
