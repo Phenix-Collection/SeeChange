@@ -1,4 +1,4 @@
-package com.thecirkel.seechange.activities;
+package com.thecirkel.seechange.fragments;
 
 import android.app.Fragment;
 import android.support.annotation.Nullable;
@@ -16,7 +16,7 @@ import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import java.util.*;
 
-public class ChatActivity extends Fragment implements Observer{
+public class ChatFragment extends Fragment implements Observer{
 
     private ListView chatListView;
 

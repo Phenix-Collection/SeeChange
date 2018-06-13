@@ -38,12 +38,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/activities/ChatFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/activities/MainActivity.java">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/adapters/ChatArrayAdapter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/fragments/ChatFragment.java">
           <value>
             <set />
           </value>
