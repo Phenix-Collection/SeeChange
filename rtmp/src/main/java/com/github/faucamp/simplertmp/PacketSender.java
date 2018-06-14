@@ -43,6 +43,8 @@ public class PacketSender {
     private Key key;
     private Socket socket;
 
+    private boolean keySend = false;
+
     protected PacketSender() {
         try {
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
@@ -77,14 +79,22 @@ public class PacketSender {
 
     private void sendPublicKey(String key) {
         socket.emit("publickey", key);
+        keySend = true;
     }
 
     private void sendToServer(String hash, RtmpPacket packet) {
+        if(!keySend) {
+            sendPublicKey(PUBLICKEY);
+        }
         socket.emit("packet", encrypt("{" +
                 " \"hash\": \"" + hash +
                 "\", \"messageType\": \"" + packet.getHeader().getMessageType() +
                 "\", \"absoluteMadTime\": " + packet.getHeader().getAbsoluteTimestamp()+
                 "}"));
+    }
+
+    public void stoppedStreaming() {
+        keySend = false;
     }
 
     private String encrypt(String data)
