@@ -10,19 +10,13 @@ import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Formatter;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 public class PacketSender {
@@ -75,23 +69,25 @@ public class PacketSender {
     }
 
     public void startSending(byte[] newPacket, RtmpPacket packet) {
-        final byte[] hash = mac.doFinal(newPacket);
-        sendToServer(encrypt(hash), packet);
+        if(socket.connected()) {
+            final byte[] hash = mac.doFinal(newPacket);
+            sendToServer(toHexString(hash), packet);
+        }
     }
 
     private void sendPublicKey(String key) {
         socket.emit("publickey", key);
     }
 
-    private void sendToServer(String digitalSignature, RtmpPacket packet) {
-        socket.emit("packet", "{" +
-                " \"digitalSignature\": \"" + digitalSignature +
+    private void sendToServer(String hash, RtmpPacket packet) {
+        socket.emit("packet", encrypt("{" +
+                " \"hash\": \"" + hash +
                 "\", \"messageType\": \"" + packet.getHeader().getMessageType() +
                 "\", \"absoluteMadTime\": " + packet.getHeader().getAbsoluteTimestamp()+
-                "}");
+                "}"));
     }
 
-    static String encrypt(byte[] data)
+    private String encrypt(String data)
     {
         String encoded = "";
         byte[] encrypted;
@@ -102,8 +98,8 @@ public class PacketSender {
             PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
-            encrypted = cipher.doFinal(data);
-            encoded = toEncryptedHexString(encrypted);
+            encrypted = cipher.doFinal(data.getBytes());
+            encoded = toHexString(encrypted);
             return encoded;
         }
         catch (Exception e) {
@@ -113,7 +109,7 @@ public class PacketSender {
     }
 
 
-    private static String toEncryptedHexString(byte[] bytes) {
+    protected String toHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
 
         Formatter formatter = new Formatter(sb);
