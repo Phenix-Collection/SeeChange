@@ -44,7 +44,7 @@ public class ChatArrayAdapter extends BaseAdapter {
         final ViewHolder viewHolder;
 
         if (view == null) {
-            view = LayoutInflater.from(this.context).inflate(R.layout.chatitem, parent);
+            view = LayoutInflater.from(this.context).inflate(R.layout.chatitem, null);
 
             viewHolder = new ViewHolder();
             viewHolder.username = view.findViewById(R.id.chatUser);
