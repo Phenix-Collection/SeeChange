@@ -36,7 +36,7 @@ public class ChatService extends Observable {
             dataClient = null;
         }
 
-        addMessage(new ChatMessage("Mooie stream!", "Bart in 't Veld"));
+        //addMessage(new ChatMessage("Mooie stream!", "Bart in 't Veld"));
     }
 
     public static ChatService getInstance(Context context) {
@@ -53,7 +53,7 @@ public class ChatService extends Observable {
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    addMessage(new ChatMessage(":FeelsGoodMan:", "Niels van Dam"));
+                    //addMessage(new ChatMessage(":FeelsGoodMan:", "Niels van Dam"));
                     setChanged();
                     notifyObservers();
                 }
@@ -69,7 +69,7 @@ public class ChatService extends Observable {
             Runnable r2 = new Runnable() {
                 @Override
                 public void run() {
-                    addMessage(new ChatMessage("Love it! <3", "Marc den Uil"));
+                    //addMessage(new ChatMessage("Love it! <3", "Marc den Uil"));
                     setChanged();
                     notifyObservers();
                 }

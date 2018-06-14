@@ -1,23 +1,24 @@
 package com.thecirkel.seechange.fragments;
 
 import android.app.Fragment;
+import android.nfc.Tag;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.thecirkel.seechange.R;
 import com.thecirkel.seechange.adapters.ChatArrayAdapter;
 import com.thecirkel.seechange.services.ChatApplication;
-import com.thecirkel.seechange.services.ChatService;
 import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import org.json.JSONException;
@@ -30,16 +31,16 @@ import io.socket.emitter.Emitter;
 
 public class ChatFragment extends Fragment {
     private static final String TAG = "ChatFragment";
-    private ListView chatListView;
 
-    private ArrayList<ChatMessage> chatList;
+    private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private ChatArrayAdapter arrayAdapter;
+    private ChatApplication chatApplication;
 
     private ImageButton sendMessageBtn;
     private EditText messageText;
     private TextView followerCount;
+    private ListView chatListView;
 
-    private ChatApplication chatApplication;
     private Socket mSocket;
 
     private Boolean isConnected = false;
@@ -47,9 +48,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            chatList = new ArrayList<>();
-
-            chatApplication = new ChatApplication() ;
+            chatApplication = new ChatApplication();
             mSocket = chatApplication.getSocket();
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT,onDisconnect);
@@ -61,6 +60,15 @@ public class ChatFragment extends Fragment {
             mSocket.connect();
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        arrayAdapter = new ChatArrayAdapter(getContext(), this.chatList);
+        chatListView.setAdapter(arrayAdapter);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.activity_chat, container, false);
     }
@@ -69,6 +77,8 @@ public class ChatFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         messageText = view.findViewById(R.id.chatText);
         followerCount = view.findViewById(R.id.followerCount);
+        chatListView = view.findViewById(R.id.ChatList);
+        chatListView.setStackFromBottom(true);
 
         sendMessageBtn = view.findViewById(R.id.sendMessageButton);
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
@@ -77,18 +87,6 @@ public class ChatFragment extends Fragment {
                 attemptSend();
             }
         });
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        initListView();
-    }
-
-    private void initListView() {
-        chatListView = getView().findViewById(R.id.ChatList);
-        arrayAdapter = new ChatArrayAdapter(getContext(), chatList);
-        chatListView.setAdapter(arrayAdapter);
     }
 
     private Emitter.Listener onConnect = new Emitter.Listener() {
@@ -122,6 +120,8 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void run() {
                     Log.e(TAG, "Error connecting");
+                    Toast.makeText(getActivity().getApplicationContext(),
+                            R.string.error_connect, Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -147,16 +147,17 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
-                    String message, username;
+                    String message, username, timestamp;
                     try {
-                        message = data.getString("message");
+                        message = data.getString("message").trim();
                         username = data.getString("username");
+                        timestamp = data.getString("timestamp");
                     } catch (JSONException e) {
                         Log.e(TAG, e.getMessage());
                         return;
                     }
 
-                    addMessage(message, username);
+                    addMessage(message, username, timestamp);
                 }
             });
         }
@@ -183,11 +184,23 @@ public class ChatFragment extends Fragment {
         }
     };
 
-    private void addMessage(String message, String username) {
-        ChatMessage messagetext = new ChatMessage(message, username);
+    private void addMessage(String message, String username, String timestamp) {
+        ChatMessage chatMessage = new ChatMessage(message, username, timestamp);
 
-        chatList.add(messagetext);
+        chatList.add(chatMessage);
+
         arrayAdapter.notifyDataSetChanged();
+        scrollToBottom();
+    }
+
+    private void scrollToBottom() {
+        chatListView.post(new Runnable() {
+            @Override
+            public void run() {
+                // Select the last row so it will scroll into view...
+                chatListView.smoothScrollToPosition(arrayAdapter.getCount() - 1);
+            }
+        });
     }
 
     private void updateFollowers(int followers) {
@@ -225,8 +238,12 @@ public class ChatFragment extends Fragment {
         super.onDestroy();
 
         mSocket.disconnect();
+
         mSocket.off(Socket.EVENT_CONNECT, onConnect);
-        mSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
+        mSocket.off(Socket.EVENT_DISCONNECT,onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        mSocket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        mSocket.off("chat_message", onNewMessage);
+        mSocket.off("update_followers", onUpdateFollowers);
     }
 }

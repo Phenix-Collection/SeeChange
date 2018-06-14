@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.thecirkel.seechange.R;
@@ -12,31 +14,58 @@ import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import java.util.List;
 
-public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
-    private final List<ChatMessage> messages;
-    private final Context context;
+public class ChatArrayAdapter extends BaseAdapter {
+    private Context context;
+    private List<ChatMessage> messages;
 
     public ChatArrayAdapter(Context context, List<ChatMessage> messages) {
-        super(context, R.layout.chatitem, messages);
-
-        this.messages = messages;
         this.context = context;
+        this.messages = messages;
     }
 
+    @Override
+    public int getCount() {
+        return messages.size();
+    }
+
+    @Override
+    public Object getItem(int i) {
+        return messages.get(i);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View rowView = convertView;
+        View view = convertView;
+        final ViewHolder viewHolder;
 
-        if (rowView == null) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            rowView = inflater.inflate(R.layout.chatitem, parent, false);
+        if (view == null) {
+            view = LayoutInflater.from(this.context).inflate(R.layout.chatitem, parent);
 
-            TextView username = rowView.findViewById(R.id.chatUser);
-            TextView message = rowView.findViewById(R.id.chatMessage);
+            viewHolder = new ViewHolder();
+            viewHolder.username = view.findViewById(R.id.chatUser);
+            viewHolder.timestamp = view.findViewById(R.id.chatTimestamp);
+            viewHolder.message = view.findViewById(R.id.chatMessage);
 
-            username.setText(messages.get(position).getUsername());
-            message.setText(messages.get(position).getMessage());
+            view.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) view.getTag();
         }
 
-        return rowView;
+        viewHolder.username.setText(messages.get(position).getUsername());
+        viewHolder.timestamp.setText(messages.get(position).getTimestamp());
+        viewHolder.message.setText(messages.get(position).getMessage());
+
+        return view;
+    }
+
+    private static class ViewHolder {
+        TextView username;
+        TextView timestamp;
+        TextView message;
     }
 }
