@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.faucamp.simplertmp.PacketSender;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.thecirkel.seechange.R;
@@ -27,11 +28,15 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private TextView liveText;
     private ImageView recordButton;
 
+    private PacketSender packetSender;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        packetSender = PacketSender.getInstance();
 
         cameraPreview = findViewById(R.id.cameraView);
         camera = new RtmpCamera1(cameraPreview, this);
@@ -108,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Toast.makeText(MainActivity.this, "Connection failed. " + reason, Toast.LENGTH_SHORT)
                         .show();
                 camera.stopStream();
+                packetSender.stoppedStreaming();
                 stoppedUI();
             }
         });
@@ -118,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                packetSender.stoppedStreaming();
                 stoppedUI();
             }
         });
