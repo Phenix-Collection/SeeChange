@@ -18,6 +18,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/encoder/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/build.gradle">
           <value>
             <set />
@@ -119,6 +124,16 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/rtmp/src/test/java/com/github/faucamp/simplertmp/PacketSenderTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtplibrary/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtsp/build.gradle">
           <value>
             <set />
           </value>
