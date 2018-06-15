@@ -10,6 +10,8 @@ import com.github.faucamp.simplertmp.packets.RtmpPacket;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,6 +27,7 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
@@ -46,6 +49,13 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 public class PacketSender {
 
@@ -78,9 +88,11 @@ public class PacketSender {
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
-            socket = IO.socket("http://188.166.127.54:3000");
+            socket = IO.socket("http://188.166.127.54:6969");
             socket.connect();
+            sendCertificate();
             sendPublicKey(PUBLICKEY);
+
 
         } catch (NoSuchAlgorithmException e) {
 
@@ -90,6 +102,67 @@ public class PacketSender {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+    public void sendCertificate() {
+
+        X509Certificate caCert;
+        //get file
+        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+
+        try {
+            // Load cert
+            InputStream is = new FileInputStream(certificateFile);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            caCert = (X509Certificate)cf.generateCertificate(is);
+            caCert.getSubjectX500Principal();
+            String alias = caCert.getSubjectX500Principal().toString();
+            String streamKey = null;
+            String avatarSource = null;
+            String bio = null;
+            String name = null;
+            String[] split = alias.split(",");
+            for (String x : split) {
+                if (x.contains("OID.1.2.3.7=")) {
+                    streamKey = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.6=")){
+                    avatarSource = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.5=")){
+                    bio = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.4=")){
+                    name = x.split("=")[1];
+                }
+            }
+
+            JSONObject cert = new JSONObject();
+            cert.put("name",name);
+            cert.put("short_bio",bio);
+            cert.put("stream_key",streamKey);
+            cert.put("avatar_source",avatarSource);
+
+            System.out.println("CERTIFICATE");
+            System.out.println(cert);
+
+            //send certificate data as JSON object
+            socket.emit("certificate",cert);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inner class to verify hostname --> Allow all hostname's
+     */
+    public static class RelaxedHostNameVerifier implements HostnameVerifier {
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
         }
     }
 
