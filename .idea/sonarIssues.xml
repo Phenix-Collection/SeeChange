@@ -13,12 +13,22 @@
             <set />
           </value>
         </entry>
-        <entry key="$PROJECT_DIR$/.travis.yml">
+        <entry key="$PROJECT_DIR$/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/encoder/build.gradle">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/mobile/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/AndroidManifest.xml">
           <value>
             <set />
           </value>
@@ -33,12 +43,22 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/activities/ChatFragment.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/activities/MainActivity.java">
           <value>
             <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/adapters/ChatArrayAdapter.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/java/com/thecirkel/seechange/fragments/ChatFragment.java">
           <value>
             <set />
           </value>
@@ -68,7 +88,52 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/main/res/values/styles.xml">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/test/java/com/thecirkel/seechange/ChatServiceTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/packetsender/src/main/java/com/thecirkel/packetsender/PacketSender.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/PacketSender.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/io/RtmpConnection.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/main/java/com/github/faucamp/simplertmp/packets/RtmpPacket.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtmp/src/test/java/com/github/faucamp/simplertmp/PacketSenderTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtplibrary/build.gradle">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/rtsp/build.gradle">
           <value>
             <set />
           </value>
@@ -94,6 +159,11 @@
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/seechangemodels/src/main/java/com/thecirkel/seechangemodels/models/Static.java">
+          <value>
+            <set />
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/settings.gradle">
           <value>
             <set />
           </value>

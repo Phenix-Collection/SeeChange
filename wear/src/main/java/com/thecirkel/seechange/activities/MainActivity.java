@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.AppOpsManagerCompat;
 import android.support.wearable.activity.WearableActivity;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -43,19 +44,10 @@ public class MainActivity extends WearableActivity implements DataClient.OnDataC
         chatList = new ArrayList<>();
 
         initListView();
-        initFakeMessages();
 
         // Enables Always-on
         setAmbientEnabled();
     }
-
-    private void initFakeMessages() {
-        chatList.add(new ChatMessage("Zieke stream!" , "Bart in 't Veld"));
-        chatList.add(new ChatMessage("Ja sws neef broer kan dit nog leuker!", "Rick Voermans"));
-        chatList.add(new ChatMessage("Wow zo vet!", "Felix Boons"));
-        chatListView.setSelection(arrayAdapter.getCount() - 1);
-    }
-
     private void initListView() {
         chatListView = findViewById(R.id.chatList);
         arrayAdapter = new ChatArrayAdapter(this, chatList);
@@ -103,5 +95,8 @@ public class MainActivity extends WearableActivity implements DataClient.OnDataC
     private void updateMessageUI(ChatMessage chatMessage) {
         username.setText(chatMessage.getUsername());
         message.setText(chatMessage.getMessage());
+    }
+
+    public void goToChat(View view) {
     }
 }
