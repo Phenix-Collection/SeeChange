@@ -152,6 +152,8 @@ public class ChatFragment extends Fragment {
                         message = data.getString("message").trim();
                         username = data.getString("username");
                         timestamp = data.getString("timestamp");
+
+
                     } catch (JSONException e) {
                         Log.e(TAG, e.getMessage());
                         return;
