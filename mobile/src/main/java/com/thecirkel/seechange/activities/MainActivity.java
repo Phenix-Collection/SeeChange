@@ -1,8 +1,13 @@
 package com.thecirkel.seechange.activities;
 
+import android.Manifest;
 import android.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -17,6 +22,11 @@ import com.thecirkel.seechange.R;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
 
 
@@ -26,16 +36,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     private TextView liveText;
     private ImageView recordButton;
+    private String PRIVATEKEY;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        cameraPreview = findViewById(R.id.cameraView);
-        camera = new RtmpCamera1(cameraPreview, this);
-        cameraPreview.getHolder().addCallback(this);
 
         recordButton = findViewById(R.id.recordButton);
 
@@ -44,7 +51,51 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         chatFragment = getFragmentManager().findFragmentById(R.id.chatFragment);
         chatFragment.getView().setVisibility(View.GONE);
+
+        cameraPreview = findViewById(R.id.cameraView);
+
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            camera = new RtmpCamera1(cameraPreview, this);
+            cameraPreview.getHolder().addCallback(this);
+        }else{
+            CheckPermissions();
+        }
+
     }
+
+    public void CheckPermissions(){
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                // Permission is not granted
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO}, 1);
+            }
+    }
+
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // camera-related task you need to do.
+                    System.out.println("PERMISSION GRANTED");
+                    camera = new RtmpCamera1(cameraPreview, this);
+                    cameraPreview.getHolder().addCallback(this);
+                    camera.startPreview();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    CheckPermissions();
+                }
+                return;
+            }
+        }
+            // other 'case' lines to check for other
+            // permissions this app might request.
+    }
+
+
 
     public void goToChat(View v) {
         chatFragment.getView().setVisibility(View.VISIBLE);
