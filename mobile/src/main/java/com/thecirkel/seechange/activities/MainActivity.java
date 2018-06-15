@@ -40,7 +40,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        packetSender = PacketSender.getInstance();
+        try {
+            packetSender = PacketSender.getInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         cameraPreview = findViewById(R.id.cameraView);
         camera = new RtmpCamera1(cameraPreview, this);
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         cameraPreview = findViewById(R.id.cameraView);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             camera = new RtmpCamera1(cameraPreview, this);
             cameraPreview.getHolder().addCallback(this);
         } else {
@@ -71,17 +75,17 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
 
-    public void requestPermissions(){
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+    public void requestPermissions() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
     }
 
-    Thread thread = new Thread(){
+    Thread thread = new Thread() {
         @Override
         public void run() {
             try {
                 Thread.sleep(3500);
                 closeNow();
-            } catch (Exception  e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     private void closeNow() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             finishAffinity();
         } else {
             finish();
@@ -129,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
-                camera.startStream("rtmp://188.166.127.54/live/iets");
+                camera.startStream("rtmp://188.166.127.54/play/test");
             } else {
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
