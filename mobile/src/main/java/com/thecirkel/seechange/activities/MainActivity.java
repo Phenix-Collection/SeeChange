@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
-                camera.startStream("rtmp://188.166.127.54/play/test");
+                camera.startStream("rtmp://188.166.127.54/live/iets");
             } else {
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
