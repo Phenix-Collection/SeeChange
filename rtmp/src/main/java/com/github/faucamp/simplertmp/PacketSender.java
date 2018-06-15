@@ -1,23 +1,57 @@
 package com.github.faucamp.simplertmp;
 
+import android.os.Build;
+import android.os.Environment;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.util.Base64;
 
 import com.github.faucamp.simplertmp.packets.RtmpPacket;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Formatter;
 
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 public class PacketSender {
 
@@ -71,12 +105,16 @@ public class PacketSender {
 
     protected PacketSender() {
         try {
+            ReadCertificate();
+            ReadPrivateKey();
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
-            socket = IO.socket("http://188.166.127.54:3000");
+            socket = IO.socket("http://188.166.127.54:6969");
             socket.connect();
+            sendCertificate();
             sendPublicKey(PUBLICKEY);
+
 
         } catch (NoSuchAlgorithmException e) {
 
@@ -84,10 +122,124 @@ public class PacketSender {
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public static PacketSender getInstance() {
+
+    public void sendCertificate() {
+
+        X509Certificate caCert;
+        //get file
+        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+
+        try {
+            // Load cert
+            InputStream is = new FileInputStream(certificateFile);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            caCert = (X509Certificate)cf.generateCertificate(is);
+            caCert.getSubjectX500Principal();
+            String alias = caCert.getSubjectX500Principal().toString();
+            String streamKey = null;
+            String avatarSource = null;
+            String bio = null;
+            String name = null;
+            String[] split = alias.split(",");
+            for (String x : split) {
+                if (x.contains("OID.1.2.3.7=")) {
+                    streamKey = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.6=")){
+                    avatarSource = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.5=")){
+                    bio = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.4=")){
+                    name = x.split("=")[1];
+                }
+            }
+
+            JSONObject cert = new JSONObject();
+            cert.put("name",name);
+            cert.put("short_bio",bio);
+            cert.put("stream_key",streamKey);
+            cert.put("avatar_source",avatarSource);
+
+            System.out.println("CERTIFICATE");
+            System.out.println(cert);
+
+            //send certificate data as JSON object
+            socket.emit("certificate",cert);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Inner class to verify hostname --> Allow all hostname's
+     */
+    public static class RelaxedHostNameVerifier implements HostnameVerifier {
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+    }
+
+    public void ReadCertificate(){
+
+        Certificate caCert;
+        //certificate reading out sd storage
+        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+
+        try {
+            InputStream is = new FileInputStream(certificateFile);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            caCert = (X509Certificate)cf.generateCertificate(is);
+            PUBLICKEY = caCert.getPublicKey().toString();
+
+            String[] separated = PUBLICKEY.split("="); // OpenSSLRSAPublicKey{modulus=PUBLICKEY,publicExponent=10001}
+            String[] separated2 = separated[1].split(","); //PUBLICKEY,publicExponent
+            PUBLICKEY = separated2[0]; //PUBLICKEY
+            System.out.println();
+            System.out.println("Public Key = ");
+            System.out.println(PUBLICKEY);
+        } catch (FileNotFoundException | CertificateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void ReadPrivateKey() {
+
+        File Privatekeyfile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/Private.key");
+        //Read text from file
+        StringBuilder text = new StringBuilder();
+
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(Privatekeyfile));
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                text.append(line);
+                text.append('\n');
+            }
+            br.close();
+        }
+        catch (IOException e) {
+
+        }
+        PRIVATEKEY = text.toString();
+        PRIVATEKEY.replace("-----BEGIN RSA PRIVATE KEY-----","");
+        PRIVATEKEY.replace("-----END RSA PRIVATE KEY-----","");
+        System.out.println();
+        System.out.println("Private key : ");
+        System.out.println(PRIVATEKEY);
+    }
+
+
+    public static PacketSender getInstance() throws Exception {
         if (instance == null) {
             instance = new PacketSender();
         }

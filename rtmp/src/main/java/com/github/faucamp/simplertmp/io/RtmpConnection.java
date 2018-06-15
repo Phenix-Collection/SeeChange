@@ -519,6 +519,8 @@ public class RtmpConnection implements RtmpPublisher {
             }
         } catch (IOException ioe) {
             Log.e(TAG, "Caught IOException during write loop, shutting down: " + ioe.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
