@@ -1,7 +1,7 @@
 package com.thecirkel.seechange.fragments;
 
 import android.app.Fragment;
-import android.nfc.Tag;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -18,12 +17,12 @@ import android.widget.Toast;
 
 import com.thecirkel.seechange.R;
 import com.thecirkel.seechange.adapters.ChatArrayAdapter;
+import com.thecirkel.seechange.services.CertificateService;
 import com.thecirkel.seechange.services.ChatApplication;
 import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.*;
 
 import io.socket.client.Socket;
@@ -45,10 +44,18 @@ public class ChatFragment extends Fragment {
 
     private Boolean isConnected = false;
 
+    CertificateService certificateService;
+    private String streamerName = "";
+    private String streamkey = "";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
             chatApplication = new ChatApplication();
+            certificateService = new CertificateService();
+            streamerName = certificateService.getStreamerName();
+            streamkey = certificateService.getStreamkey();
+
             mSocket = chatApplication.getSocket();
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT,onDisconnect);
@@ -100,7 +107,7 @@ public class ChatFragment extends Fragment {
 
                         JSONObject data = new JSONObject();
                         try {
-                            data.put("room", "room 1");
+                            data.put("room", streamkey);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -224,8 +231,8 @@ public class ChatFragment extends Fragment {
         JSONObject data = new JSONObject();
         try {
             data.put("message", message);
-            data.put("username", "kayvon");
-            data.put("room", "room 1");
+            data.put("username", streamerName);
+            data.put("room",  streamkey);
         } catch (JSONException e) {
             e.printStackTrace();
         }

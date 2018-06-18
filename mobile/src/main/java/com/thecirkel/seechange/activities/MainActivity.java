@@ -21,6 +21,7 @@ import com.github.faucamp.simplertmp.PacketSender;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.thecirkel.seechange.R;
+import com.thecirkel.seechange.services.CertificateService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private ImageView recordButton, switchcameraButton;
 
     private PacketSender packetSender;
+
+    private CertificateService certificateService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         cameraPreview = findViewById(R.id.cameraView);
         camera = new RtmpCamera1(cameraPreview, this);
         cameraPreview.getHolder().addCallback(this);
+        certificateService = new CertificateService();
 
         recordButton = findViewById(R.id.recordButton);
         switchcameraButton = findViewById(R.id.switchCameraButton);
@@ -67,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         cameraPreview = findViewById(R.id.cameraView);
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             camera = new RtmpCamera1(cameraPreview, this);
             cameraPreview.getHolder().addCallback(this);
         } else {
@@ -75,17 +79,17 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
 
-    public void requestPermissions() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+    public void requestPermissions(){
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
     }
 
-    Thread thread = new Thread() {
+    Thread thread = new Thread(){
         @Override
         public void run() {
             try {
                 Thread.sleep(3500);
                 closeNow();
-            } catch (Exception e) {
+            } catch (Exception  e) {
                 e.printStackTrace();
             }
         }
@@ -107,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     // functionality that depends on this permission.
                     recordButton.setEnabled(false);
                     switchcameraButton.setEnabled(false);
-                    Toast.makeText(this, "Can't stream without camera", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Can't stream without permissions", Toast.LENGTH_SHORT).show();
                     thread.start();
                     return;
                 }
@@ -115,7 +119,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
 
-    private void closeNow() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             finishAffinity();
         } else {
@@ -133,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
-                camera.startStream("rtmp://188.166.127.54/play/test");
+                camera.startStream("rtmp://188.166.127.54/live/" + certificateService.getStreamkey());
             } else {
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();

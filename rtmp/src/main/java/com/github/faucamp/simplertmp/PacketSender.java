@@ -1,6 +1,9 @@
 package com.github.faucamp.simplertmp;
 
+import android.os.Build;
 import android.os.Environment;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
 import android.util.Base64;
 
 import com.github.faucamp.simplertmp.packets.RtmpPacket;
@@ -31,10 +34,11 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
-
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 public class PacketSender {
 
@@ -60,9 +64,9 @@ public class PacketSender {
             socket = IO.socket("http://188.166.127.54:6969");
             socket.connect();
         } catch (NoSuchAlgorithmException e) {
-
+            e.printStackTrace();
         } catch (InvalidKeyException e) {
-
+            e.printStackTrace();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -130,7 +134,6 @@ public class PacketSender {
         }
     }
 
-
     public void readCertificate() {
 
         Certificate caCert;
@@ -148,6 +151,7 @@ public class PacketSender {
         } catch (FileNotFoundException | CertificateException e) {
             e.printStackTrace();
         }
+        return publicKey;
     }
 
     public void readPrivateKey() {
@@ -235,7 +239,6 @@ public class PacketSender {
         }
         return encoded;
     }
-
 
     protected String toHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
