@@ -221,7 +221,7 @@ public class PacketSender {
                 "}");
     }
 
-    static String encrypt(byte[] data)
+    private String encrypt(byte[] data)
     {
         String encoded = "";
         byte[] encrypted;
@@ -233,25 +233,13 @@ public class PacketSender {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
             encrypted = cipher.doFinal(data);
-            encoded = toEncryptedHexString(encrypted);
+            encoded = toHexString(encrypted);
             return encoded;
         }
         catch (Exception e) {
             e.printStackTrace();
         }
         return encoded;
-    }
-
-
-    private static String toEncryptedHexString(byte[] bytes) {
-        StringBuilder sb = new StringBuilder(bytes.length * 2);
-
-        Formatter formatter = new Formatter(sb);
-        for (byte b : bytes) {
-            formatter.format("%02x", b);
-        }
-
-        return sb.toString();
     }
 
     protected String toHexString(byte[] bytes) {
