@@ -83,7 +83,7 @@ public class PacketSender {
 
     protected PacketSender() {
         try {
-            ReadCertificate();
+            PUBLICKEY = ReadCertificatePublicKey();
             PRIVATEKEY = ReadPrivateKey();
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
@@ -146,9 +146,6 @@ public class PacketSender {
             cert.put("stream_key",streamKey);
             cert.put("avatar_source",avatarSource);
 
-            System.out.println("CERTIFICATE");
-            System.out.println(cert);
-
             //send certificate data as JSON object
             socket.emit("certificate",cert);
 
@@ -166,9 +163,10 @@ public class PacketSender {
         }
     }
 
-    public void ReadCertificate(){
+    public String ReadCertificatePublicKey(){
 
         Certificate caCert;
+        String publicKey = "";
         //certificate reading out sd storage
         File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
 
@@ -176,14 +174,15 @@ public class PacketSender {
             InputStream is = new FileInputStream(certificateFile);
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             caCert = (X509Certificate)cf.generateCertificate(is);
-            PUBLICKEY = caCert.getPublicKey().toString();
+            publicKey = caCert.getPublicKey().toString();
 
-            String[] separated = PUBLICKEY.split("="); // OpenSSLRSAPublicKey{modulus=PUBLICKEY,publicExponent=10001}
+            String[] separated = publicKey.split("="); // OpenSSLRSAPublicKey{modulus=PUBLICKEY,publicExponent=10001}
             String[] separated2 = separated[1].split(","); //PUBLICKEY,publicExponent
-            PUBLICKEY = separated2[0]; //PUBLICKEY
+            publicKey = separated2[0]; //PUBLICKEY
         } catch (FileNotFoundException | CertificateException e) {
             e.printStackTrace();
         }
+        return publicKey;
     }
 
     public String ReadPrivateKey() {

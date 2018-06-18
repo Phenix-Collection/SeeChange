@@ -52,6 +52,14 @@ public class PacketSenderTest {
 
     }
 
+    @Test
+    public void publicKey_is_filtered(){
+        String publickey = packetSender.ReadCertificatePublicKey();
+
+        assertFalse(publickey.contains("OpenSSLRSAPublicKey{modulus="));
+        assertFalse(publickey.contains("publicExponent"));
+    }
+
 
 
 
