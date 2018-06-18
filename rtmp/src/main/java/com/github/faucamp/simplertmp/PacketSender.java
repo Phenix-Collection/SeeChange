@@ -12,7 +12,6 @@ import com.github.nkzawa.socketio.client.Socket;
 
 import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,41 +20,28 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.Formatter;
 
-import javax.crypto.BadPaddingException;
+
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
+
 import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
+
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
+
 import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
+
 
 public class PacketSender {
 
@@ -173,7 +159,7 @@ public class PacketSender {
         try {
             InputStream is = new FileInputStream(certificateFile);
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            caCert = (X509Certificate)cf.generateCertificate(is);
+            caCert = cf.generateCertificate(is);
             publicKey = caCert.getPublicKey().toString();
 
             String[] separated = publicKey.split("="); // OpenSSLRSAPublicKey{modulus=PUBLICKEY,publicExponent=10001}
@@ -211,7 +197,7 @@ public class PacketSender {
     }
 
 
-    public static PacketSender getInstance() throws Exception {
+    public static PacketSender getInstance() {
         if (instance == null) {
             instance = new PacketSender();
         }
