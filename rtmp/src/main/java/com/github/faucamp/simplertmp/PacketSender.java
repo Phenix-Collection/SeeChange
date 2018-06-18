@@ -89,8 +89,10 @@ public class PacketSender {
 
     protected PacketSender() {
         try {
-            PUBLICKEY = ReadCertificatePublicKey();
-            PRIVATEKEY = ReadPrivateKey();
+            String certificatePath = Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt";
+            String privatekeyPath = Environment.getExternalStorageDirectory().toString() + "/Certificate/Private.key";
+            PUBLICKEY = ReadCertificatePublicKey(certificatePath);
+            PRIVATEKEY = ReadPrivateKey(privatekeyPath);
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
@@ -169,12 +171,12 @@ public class PacketSender {
         }
     }
 
-    public String ReadCertificatePublicKey(){
+    public String ReadCertificatePublicKey(String path){
 
         Certificate caCert;
         String publicKey = "";
         //certificate reading out sd storage
-        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+        File certificateFile = new File(path);
 
         try {
             InputStream is = new FileInputStream(certificateFile);
@@ -191,9 +193,9 @@ public class PacketSender {
         return publicKey;
     }
 
-    public String ReadPrivateKey() {
+    public String ReadPrivateKey(String path) {
 
-        File Privatekeyfile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/Private.key");
+        File Privatekeyfile = new File(path);
         //Read text from file
         StringBuilder text = new StringBuilder();
 
