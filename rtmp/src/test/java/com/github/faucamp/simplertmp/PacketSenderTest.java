@@ -48,7 +48,7 @@ public class PacketSenderTest {
 
     @Test
     public void privateKey_is_filtered(){
-        String privkey = packetSender.ReadPrivateKey("../java/com/github/faucamp/simplertmp/testfiles/testPrivate.key");
+        String privkey = packetSender.readPrivateKey("../java/com/github/faucamp/simplertmp/testfiles/testPrivate.key");
 
         assertFalse(privkey.contains("-----BEGIN RSA PRIVATE KEY-----"));
         assertFalse(privkey.contains("-----END RSA PRIVATE KEY-----"));
@@ -57,7 +57,7 @@ public class PacketSenderTest {
 
     @Test
     public void publicKey_is_filtered(){
-        String publickey = packetSender.ReadCertificatePublicKey("../java/com/github/faucamp/simplertmp/testfiles/testCertificate.crt");
+        String publickey = packetSender.readCertificate("../java/com/github/faucamp/simplertmp/testfiles/testCertificate.crt");
 
         assertFalse(publickey.contains("OpenSSLRSAPublicKey{modulus="));
         assertFalse(publickey.contains("publicExponent"));
