@@ -1,9 +1,7 @@
 package com.thecirkel.seechange.services;
 
 import android.app.Application;
-
 import com.thecirkel.seechangemodels.models.Constants;
-
 import java.net.URISyntaxException;
 
 import io.socket.client.IO;
@@ -22,4 +20,5 @@ public class ChatApplication extends Application {
     public Socket getSocket() {
         return mSocket;
     }
+
 }

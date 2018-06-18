@@ -22,8 +22,9 @@ public class ChatServiceTest {
         List<ChatMessage> chatMessages = chatService.getMessages();
         chatMessages.clear();
 
-        chatMessages.add(new ChatMessage("Test", "Test"));
+        chatMessages.add(new ChatMessage("Test", "Test", "time"));
         assertEquals(1,chatMessages.size() );
-        assertEquals(chatMessages.get(0).getClass(), new ChatMessage("Nieuw", "Nieuw").getClass());
+        assertEquals(chatMessages.get(0).getClass(),
+                new ChatMessage("Nieuw", "Nieuw", "Time").getClass());
     }
 }
