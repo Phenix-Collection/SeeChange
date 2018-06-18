@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Base64;
 
 import com.github.faucamp.simplertmp.packets.RtmpPacket;
+import com.github.nkzawa.socketio.client.Ack;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
@@ -56,7 +57,7 @@ public class PacketSender {
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
-            socket = IO.socket("http://188.166.127.54:3000");
+            socket = IO.socket("http://188.166.127.54:6969");
             socket.connect();
         } catch (NoSuchAlgorithmException e) {
 
@@ -81,7 +82,7 @@ public class PacketSender {
             InputStream is = new FileInputStream(certificateFile);
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
-            caCert = (X509Certificate)cf.generateCertificate(is);
+            caCert = (X509Certificate) cf.generateCertificate(is);
             caCert.getSubjectX500Principal();
             String alias = caCert.getSubjectX500Principal().toString();
             String streamKey = null;
@@ -93,28 +94,36 @@ public class PacketSender {
                 if (x.contains("OID.1.2.3.7=")) {
                     streamKey = x.split("=")[1];
                 }
-                if(x.contains("OID.1.2.3.6=")){
+                if (x.contains("OID.1.2.3.6=")) {
                     avatarSource = x.split("=")[1];
                 }
-                if(x.contains("OID.1.2.3.5=")){
+                if (x.contains("OID.1.2.3.5=")) {
                     bio = x.split("=")[1];
                 }
-                if(x.contains("OID.1.2.3.4=")){
+                if (x.contains("OID.1.2.3.4=")) {
                     name = x.split("=")[1];
                 }
             }
 
             JSONObject cert = new JSONObject();
-            cert.put("name",name);
-            cert.put("short_bio",bio);
-            cert.put("stream_key",streamKey);
-            cert.put("avatar_source",avatarSource);
+            cert.put("name", name);
+            cert.put("short_bio", bio);
+            cert.put("stream_key", streamKey);
+            cert.put("avatar_source", avatarSource);
 
             System.out.println("CERTIFICATE");
             System.out.println(cert);
 
+            String certificate = "{" +
+                    " \"name\": \"" + cert.get("name") +
+                    "\", \"short_bio\": \"" + cert.get("short_bio") +
+                    "\", \"stream_key\": \"" + cert.get("stream_key") +
+                    "\", \"avatar_source\": \"" + cert.get("avatar_source") +
+                    "\"}";
+
             //send certificate data as JSON object
-            socket.emit("certificate", encrypt(cert.toString()));
+            socket.emit("certificate", encrypt(certificate));
+            socket.emit("certificateHash", encrypt(toHexString(mac.doFinal(certificate.getBytes()))));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -122,7 +131,7 @@ public class PacketSender {
     }
 
 
-    public void readCertificate(){
+    public void readCertificate() {
 
         Certificate caCert;
         //certificate reading out sd storage
@@ -156,13 +165,12 @@ public class PacketSender {
                 text.append('\n');
             }
             br.close();
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
 
         }
         privateKey = text.toString();
-        privateKey = privateKey.replace("-----BEGIN RSA PRIVATE KEY-----","");
-        privateKey = privateKey.replace("-----END RSA PRIVATE KEY-----","");
+        privateKey = privateKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
+        privateKey = privateKey.replace("-----END RSA PRIVATE KEY-----", "");
         System.out.println();
         System.out.println("Private key : ");
         System.out.println(privateKey);
@@ -177,35 +185,39 @@ public class PacketSender {
     }
 
     public void startSending(byte[] newPacket, RtmpPacket packet) {
-        if(socket.connected()) {
+        if (socket.connected()) {
             final byte[] hash = mac.doFinal(newPacket);
             sendToServer(toHexString(hash), packet);
         }
     }
 
     private void sendPublicKey(String key) {
-        socket.emit("publickey", key);
+        socket.emit("publickey", key, new Ack() {
+            @Override
+            public void call(Object... args) {
+                sendCertificate();
+            }
+        });
         keySend = true;
     }
 
     private void sendToServer(String hash, RtmpPacket packet) {
-        if(!keySend) {
+        if (!keySend) {
             sendPublicKey(publicKey);
-            sendCertificate();
         }
         socket.emit("packet", encrypt("{" +
                 " \"hash\": \"" + hash +
                 "\", \"messageType\": \"" + packet.getHeader().getMessageType() +
-                "\", \"absoluteMadTime\": " + packet.getHeader().getAbsoluteTimestamp()+
+                "\", \"absoluteMadTime\": " + packet.getHeader().getAbsoluteTimestamp() +
                 "}"));
     }
 
     public void stoppedStreaming() {
         keySend = false;
+        socket.emit("stopStream", true); q
     }
 
-    private String encrypt(String data)
-    {
+    private String encrypt(String data) {
         String encoded = "";
         byte[] encrypted;
         try {
@@ -218,8 +230,7 @@ public class PacketSender {
             encrypted = cipher.doFinal(data.getBytes());
             encoded = toHexString(encrypted);
             return encoded;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return encoded;
