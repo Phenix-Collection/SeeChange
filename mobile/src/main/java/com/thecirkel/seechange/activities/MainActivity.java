@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     // functionality that depends on this permission.
                     recordButton.setEnabled(false);
                     switchcameraButton.setEnabled(false);
-                    Toast.makeText(this, "Can't stream without camera", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Can't stream without permissions", Toast.LENGTH_SHORT).show();
                     thread.start();
                     return;
                 }

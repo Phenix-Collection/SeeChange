@@ -84,7 +84,7 @@ public class PacketSender {
     protected PacketSender() {
         try {
             ReadCertificate();
-            ReadPrivateKey();
+            PRIVATEKEY = ReadPrivateKey();
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
@@ -181,15 +181,12 @@ public class PacketSender {
             String[] separated = PUBLICKEY.split("="); // OpenSSLRSAPublicKey{modulus=PUBLICKEY,publicExponent=10001}
             String[] separated2 = separated[1].split(","); //PUBLICKEY,publicExponent
             PUBLICKEY = separated2[0]; //PUBLICKEY
-            System.out.println();
-            System.out.println("Public Key = ");
-            System.out.println(PUBLICKEY);
         } catch (FileNotFoundException | CertificateException e) {
             e.printStackTrace();
         }
     }
 
-    public void ReadPrivateKey() {
+    public String ReadPrivateKey() {
 
         File Privatekeyfile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/Private.key");
         //Read text from file
@@ -208,12 +205,10 @@ public class PacketSender {
         catch (IOException e) {
 
         }
-        PRIVATEKEY = text.toString();
-        PRIVATEKEY.replace("-----BEGIN RSA PRIVATE KEY-----","");
-        PRIVATEKEY.replace("-----END RSA PRIVATE KEY-----","");
-        System.out.println();
-        System.out.println("Private key : ");
-        System.out.println(PRIVATEKEY);
+        String privatekey = text.toString();
+        privatekey.replace("-----BEGIN RSA PRIVATE KEY-----","");
+        privatekey.replace("-----END RSA PRIVATE KEY-----","");
+        return privatekey;
     }
 
 
@@ -264,6 +259,17 @@ public class PacketSender {
 
 
     private static String toEncryptedHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder(bytes.length * 2);
+
+        Formatter formatter = new Formatter(sb);
+        for (byte b : bytes) {
+            formatter.format("%02x", b);
+        }
+
+        return sb.toString();
+    }
+
+    protected String toHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
 
         Formatter formatter = new Formatter(sb);
