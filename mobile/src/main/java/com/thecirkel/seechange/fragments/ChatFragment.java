@@ -23,12 +23,6 @@ import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.*;
 
 import io.socket.client.Socket;
@@ -50,16 +44,18 @@ public class ChatFragment extends Fragment {
 
     private Boolean isConnected = false;
 
+    CertificateService certificateService;
     private String streamerName = "";
     private String streamkey = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            CertificateService certificateService = new CertificateService();
+            chatApplication = new ChatApplication();
+            certificateService = new CertificateService();
             streamerName = certificateService.getStreamerName();
             streamkey = certificateService.getStreamkey();
-            chatApplication = new ChatApplication();
+
             mSocket = chatApplication.getSocket();
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
             mSocket.on(Socket.EVENT_DISCONNECT,onDisconnect);
