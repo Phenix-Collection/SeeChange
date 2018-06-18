@@ -34,6 +34,7 @@ public class ChatFragment extends Fragment {
     private ArrayList<ChatMessage> chatList = new ArrayList<>();
     private ChatArrayAdapter arrayAdapter;
     private ChatApplication chatApplication;
+    private CertificateService certificateService;
 
     private ImageButton sendMessageBtn;
     private EditText messageText;
@@ -44,7 +45,6 @@ public class ChatFragment extends Fragment {
 
     private Boolean isConnected = false;
 
-    CertificateService certificateService;
     private String streamerName = "";
     private String streamkey = "";
 
@@ -85,6 +85,7 @@ public class ChatFragment extends Fragment {
         messageText = view.findViewById(R.id.chatText);
         followerCount = view.findViewById(R.id.followerCount);
         chatListView = view.findViewById(R.id.ChatList);
+
         chatListView.setStackFromBottom(true);
 
         sendMessageBtn = view.findViewById(R.id.sendMessageButton);

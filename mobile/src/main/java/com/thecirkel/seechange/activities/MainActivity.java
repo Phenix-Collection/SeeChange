@@ -1,12 +1,13 @@
 package com.thecirkel.seechange.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
@@ -21,6 +22,7 @@ import com.github.faucamp.simplertmp.PacketSender;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.thecirkel.seechange.R;
+import com.thecirkel.seechange.fragments.InfoFragment;
 import com.thecirkel.seechange.services.CertificateService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
@@ -28,10 +30,10 @@ import net.ossrs.rtmp.ConnectCheckerRtmp;
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
-    private Fragment chatFragment;
+    private Fragment chatFragment, infoFragment;
 
     private TextView liveText;
-    private ImageView recordButton, switchcameraButton;
+    private ImageView recordButton, switchcameraButton, closechatButton, closeinfoButton, gochatButton;
 
     private PacketSender packetSender;
 
@@ -42,6 +44,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        //infoFragment = getFragmentManager().findFragmentById(R.id.infoFragment);
+        chatFragment = getFragmentManager().findFragmentById(R.id.chatFragment);
+
         packetSender = PacketSender.getInstance();
         certificateService = new CertificateService();
 
@@ -57,8 +63,33 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         liveText = findViewById(R.id.liveText);
         liveText.setVisibility(View.INVISIBLE);
 
-        chatFragment = getFragmentManager().findFragmentById(R.id.chatFragment);
-        chatFragment.getView().setVisibility(View.GONE);
+        closechatButton = findViewById(R.id.closeButton);
+        closechatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                closeChat();
+            }
+        });
+
+        gochatButton = findViewById(R.id.chatButton);
+        gochatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToChat();
+            }
+        });
+
+//        closeinfoButton = findViewById(R.id.closeinfoButton);
+////        closeinfoButton.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View view) {
+////                FragmentManager fm = getFragmentManager();
+////                fm.beginTransaction()
+////                        .setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out)
+////                        .hide(infoFragment)
+////                        .commit();
+////            }
+////        });
 
         cameraPreview = findViewById(R.id.cameraView);
 
@@ -118,8 +149,34 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
     }
 
-    public void goToChat(View v) {
-        chatFragment.getView().setVisibility(View.VISIBLE);
+    public void goToChat() {
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction()
+                .hide(infoFragment)
+                .show(chatFragment)
+                .commit();
+    }
+
+    public void closeChat() {
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction()
+                .hide(chatFragment)
+                .commit();
+    }
+
+    public void goToInfo() {
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction()
+                .hide(chatFragment)
+                .show(infoFragment)
+                .commit();
+    }
+
+    public void closeInfo() {
+        FragmentManager fm = getFragmentManager();
+        fm.beginTransaction()
+                .hide(infoFragment)
+                .commit();
     }
 
     public void startStopCamera(View v) {
@@ -145,10 +202,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         } catch (CameraOpenException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void hideChat(View v) {
-        chatFragment.getView().setVisibility(View.GONE);
     }
 
     private void startedUI() {

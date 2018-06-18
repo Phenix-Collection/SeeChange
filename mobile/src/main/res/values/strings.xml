@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">SeeChange</string>
-    
+
     <string name="icon_eye">&#xf06e;</string>
 
     <string name="error_connect">Failed to connect</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
