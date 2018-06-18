@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        packetSender = PacketSender.getInstance();
+
         recordButton = findViewById(R.id.recordButton);
         switchcameraButton = findViewById(R.id.switchCameraButton);
         switchcameraButton.setOnClickListener(new View.OnClickListener() {

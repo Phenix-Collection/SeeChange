@@ -103,9 +103,9 @@ public class PacketSender {
 
 
         } catch (NoSuchAlgorithmException e) {
-
+            e.printStackTrace();
         } catch (InvalidKeyException e) {
-
+            e.printStackTrace();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (Exception e) {
@@ -210,7 +210,7 @@ public class PacketSender {
             br.close();
         }
         catch (IOException e) {
-
+            e.printStackTrace();
         }
         String privatekey = text.toString();
         privatekey.replace("-----BEGIN RSA PRIVATE KEY-----","");
