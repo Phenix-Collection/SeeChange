@@ -44,19 +44,10 @@ public class MainActivity extends WearableActivity implements DataClient.OnDataC
         chatList = new ArrayList<>();
 
         initListView();
-        initFakeMessages();
 
         // Enables Always-on
         setAmbientEnabled();
     }
-
-    private void initFakeMessages() {
-        chatList.add(new ChatMessage("Zieke stream!" , "Bart in 't Veld"));
-        chatList.add(new ChatMessage("Ja sws neef broer kan dit nog leuker!", "Rick Voermans"));
-        chatList.add(new ChatMessage("Wow zo vet!", "Felix Boons"));
-        chatListView.setSelection(arrayAdapter.getCount() - 1);
-    }
-
     private void initListView() {
         chatListView = findViewById(R.id.chatList);
         arrayAdapter = new ChatArrayAdapter(this, chatList);

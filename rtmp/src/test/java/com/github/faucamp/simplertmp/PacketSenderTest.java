@@ -1,4 +1,5 @@
 package com.github.faucamp.simplertmp;
+
 import android.os.Environment;
 
 import org.junit.Before;
@@ -7,6 +8,7 @@ import org.junit.Test;
 import java.io.File;
 
 import static junit.framework.Assert.assertEquals;
+
 import static org.junit.Assert.*;
 
 public class PacketSenderTest {
@@ -20,6 +22,7 @@ public class PacketSenderTest {
 
     @Test
     public void there_is_on_instance() throws Exception {
+
         PacketSender packetSender1 = PacketSender.getInstance();
         PacketSender packetSender2 = PacketSender.getInstance();
 
@@ -59,8 +62,5 @@ public class PacketSenderTest {
         assertFalse(publickey.contains("OpenSSLRSAPublicKey{modulus="));
         assertFalse(publickey.contains("publicExponent"));
     }
-
-
-
 
 }

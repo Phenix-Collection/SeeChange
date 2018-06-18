@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.faucamp.simplertmp.PacketSender;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.thecirkel.seechange.R;
@@ -31,12 +32,13 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private TextView liveText;
     private ImageView recordButton, switchcameraButton;
 
+    private PacketSender packetSender;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         recordButton = findViewById(R.id.recordButton);
         switchcameraButton = findViewById(R.id.switchCameraButton);
         switchcameraButton.setOnClickListener(new View.OnClickListener() {
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
-                camera.startStream("rtmp://188.166.127.54/play/test");
+                camera.startStream("rtmp://188.166.127.54/live/iets");
             } else {
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 Toast.makeText(MainActivity.this, "Connection failed. " + reason, Toast.LENGTH_SHORT)
                         .show();
                 camera.stopStream();
+                packetSender.stoppedStreaming();
                 stoppedUI();
             }
         });
@@ -182,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                packetSender.stoppedStreaming();
                 stoppedUI();
             }
         });
