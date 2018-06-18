@@ -1,8 +1,14 @@
 package com.thecirkel.seechange.activities;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -19,14 +25,12 @@ import com.thecirkel.seechange.R;
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
-
-
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
     private Fragment chatFragment;
 
     private TextView liveText;
-    private ImageView recordButton;
+    private ImageView recordButton, switchcameraButton;
 
     private PacketSender packetSender;
 
@@ -35,20 +39,79 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         packetSender = PacketSender.getInstance();
 
-        cameraPreview = findViewById(R.id.cameraView);
-        camera = new RtmpCamera1(cameraPreview, this);
-        cameraPreview.getHolder().addCallback(this);
-
         recordButton = findViewById(R.id.recordButton);
+        switchcameraButton = findViewById(R.id.switchCameraButton);
+        switchcameraButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                switchCamera(view);
+            }
+        });
 
         liveText = findViewById(R.id.liveText);
         liveText.setVisibility(View.INVISIBLE);
 
         chatFragment = getFragmentManager().findFragmentById(R.id.chatFragment);
         chatFragment.getView().setVisibility(View.GONE);
+
+        cameraPreview = findViewById(R.id.cameraView);
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+            camera = new RtmpCamera1(cameraPreview, this);
+            cameraPreview.getHolder().addCallback(this);
+        } else {
+            requestPermissions();
+        }
+    }
+
+    public void requestPermissions(){
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+    }
+
+    Thread thread = new Thread(){
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(3500);
+                closeNow();
+            } catch (Exception  e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! Do the
+                    // camera-related task you need to do.
+                    camera = new RtmpCamera1(cameraPreview, this);
+                    cameraPreview.getHolder().addCallback(this);
+                    camera.startPreview();
+
+                    return;
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    recordButton.setEnabled(false);
+                    switchcameraButton.setEnabled(false);
+                    Toast.makeText(this, "Can't stream without permissions", Toast.LENGTH_SHORT).show();
+                    thread.start();
+                    return;
+                }
+            }
+        }
+    }
+
+    private void closeNow() {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+            finishAffinity();
+        } else {
+            finish();
+        }
     }
 
     public void goToChat(View v) {
@@ -168,5 +231,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         }
         camera.stopPreview();
     }
+
 
 }

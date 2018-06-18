@@ -33,5 +33,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-wearable:+'
     implementation project(':seechangeshared')
     implementation project(path: ':rtplibrary')
-    implementation 'io.socket:socket.io-client:0.8.3'
+    implementation ('io.socket:socket.io-client:1.0.0') {
+        // excluding org.json which is provided by Android
+        exclude group: 'org.json', module: 'json'
+    }
 }
+
