@@ -21,6 +21,7 @@ import com.github.faucamp.simplertmp.PacketSender;
 import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.thecirkel.seechange.R;
+import com.thecirkel.seechange.services.CertificateService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private ImageView recordButton, switchcameraButton;
 
     private PacketSender packetSender;
+
+    private CertificateService certificateService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
-                camera.startStream("rtmp://188.166.127.54/live/iets");
+                camera.startStream("rtmp://188.166.127.54/live/" + certificateService.getStreamkey());
             } else {
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();

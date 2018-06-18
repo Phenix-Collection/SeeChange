@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.thecirkel.seechange.R;
 import com.thecirkel.seechange.adapters.ChatArrayAdapter;
+import com.thecirkel.seechange.services.CertificateService;
 import com.thecirkel.seechange.services.ChatApplication;
 import com.thecirkel.seechangemodels.models.ChatMessage;
 
@@ -50,14 +51,14 @@ public class ChatFragment extends Fragment {
     private Boolean isConnected = false;
 
     private String streamerName = "";
-    private String shortbio = "";
     private String streamkey = "";
-    private String avatarsource = "";
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            getStreamerData();
+            CertificateService certificateService = new CertificateService();
+            streamerName = certificateService.getStreamerName();
+            streamkey = certificateService.getStreamkey();
             chatApplication = new ChatApplication();
             mSocket = chatApplication.getSocket();
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
@@ -69,41 +70,6 @@ public class ChatFragment extends Fragment {
 
             mSocket.connect();
     }
-
-    public void getStreamerData(){
-        X509Certificate caCert;
-        //get file
-        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
-
-        try {
-            // Load cert
-            InputStream is = new FileInputStream(certificateFile);
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-
-            caCert = (X509Certificate)cf.generateCertificate(is);
-            caCert.getSubjectX500Principal();
-            String alias = caCert.getSubjectX500Principal().toString();
-            String[] split = alias.split(",");
-            for (String x : split) {
-                if (x.contains("OID.1.2.3.7=")) {
-                    streamkey = x.split("=")[1];
-                }
-                if(x.contains("OID.1.2.3.6=")){
-                    avatarsource = x.split("=")[1];
-                }
-                if(x.contains("OID.1.2.3.5=")){
-                    shortbio = x.split("=")[1];
-                }
-                if(x.contains("OID.1.2.3.4=")){
-                    streamerName = x.split("=")[1];
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
