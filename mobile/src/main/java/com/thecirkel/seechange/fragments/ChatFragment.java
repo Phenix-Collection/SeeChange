@@ -1,7 +1,7 @@
 package com.thecirkel.seechange.fragments;
 
 import android.app.Fragment;
-import android.nfc.Tag;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -24,6 +23,11 @@ import com.thecirkel.seechangemodels.models.ChatMessage;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 import io.socket.client.Socket;
@@ -45,9 +49,15 @@ public class ChatFragment extends Fragment {
 
     private Boolean isConnected = false;
 
+    private String streamerName = "";
+    private String shortbio = "";
+    private String streamkey = "";
+    private String avatarsource = "";
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+            getStreamerData();
             chatApplication = new ChatApplication();
             mSocket = chatApplication.getSocket();
             mSocket.on(Socket.EVENT_CONNECT, onConnect);
@@ -59,6 +69,41 @@ public class ChatFragment extends Fragment {
 
             mSocket.connect();
     }
+
+    public void getStreamerData(){
+        X509Certificate caCert;
+        //get file
+        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+
+        try {
+            // Load cert
+            InputStream is = new FileInputStream(certificateFile);
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+
+            caCert = (X509Certificate)cf.generateCertificate(is);
+            caCert.getSubjectX500Principal();
+            String alias = caCert.getSubjectX500Principal().toString();
+            String[] split = alias.split(",");
+            for (String x : split) {
+                if (x.contains("OID.1.2.3.7=")) {
+                    streamkey = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.6=")){
+                    avatarsource = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.5=")){
+                    shortbio = x.split("=")[1];
+                }
+                if(x.contains("OID.1.2.3.4=")){
+                    streamerName = x.split("=")[1];
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -100,7 +145,7 @@ public class ChatFragment extends Fragment {
 
                         JSONObject data = new JSONObject();
                         try {
-                            data.put("room", "room 1");
+                            data.put("room", streamkey);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -224,8 +269,8 @@ public class ChatFragment extends Fragment {
         JSONObject data = new JSONObject();
         try {
             data.put("message", message);
-            data.put("username", "kayvon");
-            data.put("room", "room 1");
+            data.put("username", streamerName);
+            data.put("room",  streamkey);
         } catch (JSONException e) {
             e.printStackTrace();
         }
