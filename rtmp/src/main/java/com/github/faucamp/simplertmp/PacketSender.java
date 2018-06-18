@@ -134,11 +134,11 @@ public class PacketSender {
         }
     }
 
-    public void readCertificate() {
+    public String readCertificate(String path) {
 
         Certificate caCert;
         //certificate reading out sd storage
-        File certificateFile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+        File certificateFile = new File(path);
 
         try {
             InputStream is = new FileInputStream(certificateFile);
@@ -154,9 +154,17 @@ public class PacketSender {
         return publicKey;
     }
 
-    public void readPrivateKey() {
+    public String readPrivateKey() {
+        return readPrivateKey(Environment.getExternalStorageDirectory().toString() + "/Certificate/Private.key");
+    }
 
-        File Privatekeyfile = new File(Environment.getExternalStorageDirectory().toString() + "/Certificate/Private.key");
+    public String readCertificate() {
+        return readCertificate(Environment.getExternalStorageDirectory().toString() + "/Certificate/client.crt");
+    }
+
+    public String readPrivateKey(String path) {
+
+        File Privatekeyfile = new File(path);
         //Read text from file
         StringBuilder text = new StringBuilder();
 
@@ -178,6 +186,7 @@ public class PacketSender {
         System.out.println();
         System.out.println("Private key : ");
         System.out.println(privateKey);
+        return  privateKey;
     }
 
 
@@ -218,7 +227,7 @@ public class PacketSender {
 
     public void stoppedStreaming() {
         keySend = false;
-        socket.emit("stopStream", true); q
+        socket.emit("stopStream", true);
     }
 
     private String encrypt(String data) {
