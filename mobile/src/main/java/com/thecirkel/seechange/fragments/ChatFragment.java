@@ -43,6 +43,7 @@ public class ChatFragment extends Fragment {
     private Socket mSocket;
 
     private Boolean isConnected = false;
+    private Boolean ConnectionError = false;
 
     CertificateService certificateService;
     private String streamerName = "";
@@ -65,6 +66,7 @@ public class ChatFragment extends Fragment {
             mSocket.on("update_followers", onUpdateFollowers);
 
             mSocket.connect();
+
     }
 
     @Override
@@ -114,6 +116,7 @@ public class ChatFragment extends Fragment {
 
                         mSocket.emit("join_room", data);
                         isConnected = true;
+                        ConnectionError = false;
                     }
                 }
             });
@@ -126,9 +129,12 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.e(TAG, "Error connecting");
-                    Toast.makeText(getActivity().getApplicationContext(),
-                            R.string.error_connect, Toast.LENGTH_LONG).show();
+                    if(!ConnectionError){
+                        Log.e(TAG, "Error connecting");
+                        Toast.makeText(getActivity().getApplicationContext(),
+                                R.string.error_connect, Toast.LENGTH_LONG).show();
+                    }
+                    ConnectionError = true;
                 }
             });
         }

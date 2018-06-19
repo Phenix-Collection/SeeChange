@@ -3,6 +3,6 @@
 
     <string name="icon_eye">&#xf06e;</string>
 
-    <string name="error_connect">Failed to connect</string>
+    <string name="error_connect">Failed to connect to chat</string>
     <string name="satoshi_text">Satoshi earned :</string>
 </resources>
