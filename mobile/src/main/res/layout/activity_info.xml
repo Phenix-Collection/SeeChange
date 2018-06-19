@@ -38,6 +38,7 @@
 
     <TextView
         android:id="@+id/satoshiText"
+        android:textSize="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
@@ -61,7 +62,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="70dp"
             android:text="Satoshi amount "
-            android:textSize="12sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/satoshiIcon"

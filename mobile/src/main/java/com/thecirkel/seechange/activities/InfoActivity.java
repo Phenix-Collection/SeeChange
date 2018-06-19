@@ -38,9 +38,7 @@ public class InfoActivity extends AppCompatActivity {
         certificateService = new CertificateService();
 
         avatar = findViewById(R.id.avatar);
-//        "http://i.imgur.com/DvpvklR.png"
-//        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
-        Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(avatar);
+        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
 
         name = findViewById(R.id.name);
         name.setText(certificateService.getStreamerName());
@@ -57,7 +55,6 @@ public class InfoActivity extends AppCompatActivity {
         closeInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //finish();
                 finish();
             }
         });

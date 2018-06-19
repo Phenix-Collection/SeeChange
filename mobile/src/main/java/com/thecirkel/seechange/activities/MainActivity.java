@@ -155,14 +155,18 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
                 infoButton.setEnabled(false);
+                infoButton.setVisibility(View.GONE);
                 camera.startStream("rtmp://188.166.127.54:1999/live/" + certificateService.getStreamkey());
             } else {
+                infoButton.setEnabled(true);
+                infoButton.setVisibility(View.VISIBLE);
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
             }
         } else {
             liveText.setVisibility(View.INVISIBLE);
             infoButton.setEnabled(true);
+            infoButton.setVisibility(View.VISIBLE);
             camera.stopStream();
         }
     }
@@ -209,6 +213,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                         .show();
                 camera.stopStream();
                 packetSender.stoppedStreaming();
+                infoButton.setEnabled(true);
+                infoButton.setVisibility(View.VISIBLE);
                 stoppedUI();
             }
         });
