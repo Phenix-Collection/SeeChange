@@ -3,6 +3,7 @@ package com.thecirkel.seechange.activities;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +31,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
     private Fragment chatFragment;
+    private ImageView infoButton;
+    private InfoActivity infoActivity;
+    private Intent intent;
 
     private TextView liveText;
     private ImageView recordButton, switchcameraButton;
@@ -49,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             e.printStackTrace();
         }
 
+        infoActivity = new InfoActivity();
+        intent = new Intent(this,InfoActivity.class);
+
         cameraPreview = findViewById(R.id.cameraView);
         camera = new RtmpCamera1(cameraPreview, this);
         cameraPreview.getHolder().addCallback(this);
@@ -68,6 +76,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         chatFragment = getFragmentManager().findFragmentById(R.id.chatFragment);
         chatFragment.getView().setVisibility(View.GONE);
+
+        infoButton = findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(intent);
+            }
+        });
 
         cameraPreview = findViewById(R.id.cameraView);
 
@@ -138,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
+                infoButton.setEnabled(false);
                 camera.startStream("rtmp://188.166.127.54:1999/live/" + certificateService.getStreamkey());
             } else {
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
@@ -145,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }
         } else {
             liveText.setVisibility(View.INVISIBLE);
+            infoButton.setEnabled(true);
             camera.stopStream();
         }
     }

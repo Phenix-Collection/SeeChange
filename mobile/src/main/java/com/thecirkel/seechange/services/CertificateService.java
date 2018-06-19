@@ -1,11 +1,13 @@
 package com.thecirkel.seechange.services;
 
+import android.net.Uri;
 import android.os.Environment;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
+import java.net.URI;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
@@ -34,7 +36,7 @@ public class CertificateService {
     private String streamerName = "";
     private String shortbio = "";
     private String streamkey = "";
-    private String avatarsource = "";
+    private String avatarsource ;
 
 
     public CertificateService(){

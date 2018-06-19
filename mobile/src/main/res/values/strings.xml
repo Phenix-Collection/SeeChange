@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">SeeChange</string>
-    
+
     <string name="icon_eye">&#xf06e;</string>
 
     <string name="error_connect">Failed to connect</string>
+    <string name="satoshi_text">Satoshi earned :</string>
 </resources>
