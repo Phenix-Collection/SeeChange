@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.thecirkel.seechange.R;
@@ -26,6 +27,7 @@ public class InfoActivity extends AppCompatActivity {
 
     CertificateService certificateService;
     ImageView closeInfo,avatar;
+    TextView name,bio,satoshiAmount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,20 +37,25 @@ public class InfoActivity extends AppCompatActivity {
         certificateService = new CertificateService();
 
         avatar = findViewById(R.id.avatar);
+        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
 
+        name = findViewById(R.id.name);
+        name.setText(certificateService.getStreamerName());
+
+        bio = findViewById(R.id.shortBio);
+        bio.setText(certificateService.getShortbio());
+
+        satoshiAmount = findViewById(R.id.satoshiAmount);
+        satoshiAmount.setText("1021328 " + "㋛");
 
         closeInfo = findViewById(R.id.closeInfoButton);
         closeInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //finish();
-                loadImage();
+                finish();
             }
         });
-    }
-
-    private void loadImage() {
-        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
     }
 
 
