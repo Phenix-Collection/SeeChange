@@ -46,14 +46,36 @@
         android:text="@string/satoshi_text"
         />
 
-    <TextView
-        android:id="@+id/satoshiAmount"
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_below="@id/shortBio"
-        android:layout_toRightOf="@id/satoshiText"
-        android:text="Satoshi amount "/>
+        android:layout_alignBottom="@+id/satoshiText"
+        android:layout_toStartOf="@+id/closeInfoButton"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/satoshiAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="70dp"
+            android:text="Satoshi amount "
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/satoshiIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="-62dp"
+            android:layout_toEndOf="@+id/satoshiAmount"
+            android:text="㋛"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
 
     <ImageButton
         android:id="@+id/closeInfoButton"

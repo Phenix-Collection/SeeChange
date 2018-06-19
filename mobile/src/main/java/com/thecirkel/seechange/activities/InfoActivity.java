@@ -27,7 +27,8 @@ public class InfoActivity extends AppCompatActivity {
 
     CertificateService certificateService;
     ImageView closeInfo,avatar;
-    TextView name,bio,satoshiAmount;
+    TextView name,bio,satoshiAmount, satoshiIcon;
+    Integer testSatoshi = 12345;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,9 @@ public class InfoActivity extends AppCompatActivity {
         certificateService = new CertificateService();
 
         avatar = findViewById(R.id.avatar);
-        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
+//        "http://i.imgur.com/DvpvklR.png"
+//        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
+        Picasso.get().load("http://i.imgur.com/DvpvklR.png").into(avatar);
 
         name = findViewById(R.id.name);
         name.setText(certificateService.getStreamerName());
@@ -46,7 +49,9 @@ public class InfoActivity extends AppCompatActivity {
         bio.setText(certificateService.getShortbio());
 
         satoshiAmount = findViewById(R.id.satoshiAmount);
-        satoshiAmount.setText("1021328 " + "㋛");
+        satoshiAmount.setText( "" + testSatoshi);
+        satoshiIcon = findViewById(R.id.satoshiIcon);
+        satoshiIcon.setText("㋛");
 
         closeInfo = findViewById(R.id.closeInfoButton);
         closeInfo.setOnClickListener(new View.OnClickListener() {
