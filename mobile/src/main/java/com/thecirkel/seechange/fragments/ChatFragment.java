@@ -96,7 +96,7 @@ public class ChatFragment extends Fragment {
         });
     }
 
-    private Emitter.Listener onConnect = new Emitter.Listener() {
+    public Emitter.Listener onConnect = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             getActivity().runOnUiThread(new Runnable() {
@@ -134,7 +134,7 @@ public class ChatFragment extends Fragment {
         }
     };
 
-    private Emitter.Listener onDisconnect = new Emitter.Listener() {
+    public Emitter.Listener onDisconnect = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             getActivity().runOnUiThread(new Runnable() {
@@ -159,6 +159,8 @@ public class ChatFragment extends Fragment {
                         message = data.getString("message").trim();
                         username = data.getString("username");
                         timestamp = data.getString("timestamp");
+
+
                     } catch (JSONException e) {
                         Log.e(TAG, e.getMessage());
                         return;
@@ -214,7 +216,7 @@ public class ChatFragment extends Fragment {
         followerCount.setText(Integer.toString(followers));
     }
 
-    private void attemptSend() {
+    public void attemptSend() {
         if (!mSocket.connected()) return;
 
         String message = messageText.getText().toString().trim();
