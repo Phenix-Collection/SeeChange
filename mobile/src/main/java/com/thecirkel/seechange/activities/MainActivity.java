@@ -30,6 +30,7 @@ import net.ossrs.rtmp.ConnectCheckerRtmp;
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
+
     private Fragment chatFragment;
     private ImageView infoButton;
     private InfoActivity infoActivity;
@@ -58,8 +59,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         intent = new Intent(this,InfoActivity.class);
 
         cameraPreview = findViewById(R.id.cameraView);
-        camera = new RtmpCamera1(cameraPreview, this);
-        cameraPreview.getHolder().addCallback(this);
         certificateService = new CertificateService();
 
         recordButton = findViewById(R.id.recordButton);
