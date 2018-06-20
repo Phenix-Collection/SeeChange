@@ -27,6 +27,11 @@ import com.thecirkel.seechange.services.CertificateService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;

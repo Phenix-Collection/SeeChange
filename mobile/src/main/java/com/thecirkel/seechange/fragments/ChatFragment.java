@@ -235,14 +235,19 @@ public class ChatFragment extends Fragment {
         // perform the sending message attempt.
 
         JSONObject data = new JSONObject();
+        JSONObject data2 = new JSONObject();
+
         try {
-            data.put("message", message);
-            data.put("username", streamerName);
-            data.put("room",  streamkey);
+            data2.put("message", message);
+            data2.put("username", streamerName);
+            data2.put("room",  streamkey);
+            data.put("id",UUID.randomUUID());
+            data.put("data",data2);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
+        mSocket.emit("chat_message", data);
         mSocket.emit("chat_message", data);
     }
 
