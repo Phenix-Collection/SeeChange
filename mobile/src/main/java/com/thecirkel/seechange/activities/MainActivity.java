@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private Handler handler = new Handler();
     private Runnable runnable;
     private Thread timerRunnable;
-    private int counter = 0, satoshi = 0, Seconds, Minutes, MilliSeconds;
+    private Double counter = 0.5, satoshi = -0.5;
+    private int Seconds, Minutes, MilliSeconds;
     private long MillisecondTime, StartTime, TimeBuff, UpdateTime = 0L, delay = (1L*6000L);
 
 
@@ -114,20 +115,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             @Override
             public void run() {
                 handler.postDelayed(this, delay);
-                if(counter == 0) {
-                    counter++;
-                }
-                else if(counter == 1) {
-                    satoshi = 1;
-                    counter++;
-                } else if (counter == 2){
-                    satoshi += counter;
-                    counter++;
-                } else {
-                    counter = counter * 2;
-                    satoshi += counter;
-                }
-                amountSatoshi.setText(satoshi + "S");
+                satoshi += counter;
+                counter *= 2;
+
+                amountSatoshi.setText(satoshi.intValue() + "S");
             }
         };
 
@@ -198,26 +189,25 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
 
     public void goToChat(View v) {
+        timer.setVisibility(View.GONE);
+        amountSatoshi.setVisibility(View.GONE);
         chatFragment.getView().setVisibility(View.VISIBLE);
     }
 
     public void startStopCamera(View v) {
         if (!camera.isStreaming()) {
-            if (camera.isRecording()
-                    || camera.prepareAudio() && camera.prepareVideo()) {
+            if (camera.isRecording() || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
                 camera.startStream("rtmp://188.166.127.54/live/" + certificateService.getStreamkey());
                 infoButton.setEnabled(false);
                 infoButton.setVisibility(View.GONE);
+                startSatoshiTimer();
 
-                //Satoshi:
-                handler.post(runnable);
-                StartTime = SystemClock.uptimeMillis();
-                timerRunnable.run();
             } else {
                 infoButton.setEnabled(true);
                 infoButton.setVisibility(View.VISIBLE);
+                stopSatoshiTimer();
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
             }
@@ -226,22 +216,36 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             infoButton.setEnabled(true);
             infoButton.setVisibility(View.VISIBLE);
             camera.stopStream();
+            stopSatoshiTimer();
 
-            // Cancel satoshi counter and amount calculator:
-            timerRunnable.interrupt();
-            handler.removeCallbacks(timerRunnable);
-            counter = 0;
-            satoshi = 0;
-            amountSatoshi.setText("Satoshi");
-            MillisecondTime = 0L;
-            TimeBuff = 0L;
-            UpdateTime = 0L;
-            Seconds = 0;
-            Minutes = 0;
-            MilliSeconds = 0;
-            timer.setText("00:00");
         }
     }
+
+    public void startSatoshiTimer(){
+        //Satoshi:
+        timer.setVisibility(View.VISIBLE);
+        handler.post(runnable);
+        StartTime = SystemClock.uptimeMillis();
+        timerRunnable.run();
+    }
+
+    public void stopSatoshiTimer(){
+        // Cancel satoshi counter and amount calculator:
+        timer.setVisibility(View.GONE);
+        timerRunnable.interrupt();
+        handler.removeCallbacks(timerRunnable);
+        counter = 0.0;
+        satoshi = 0.0;
+        amountSatoshi.setText("Satoshi");
+        MillisecondTime = 0L;
+        TimeBuff = 0L;
+        UpdateTime = 0L;
+        Seconds = 0;
+        Minutes = 0;
+        MilliSeconds = 0;
+        timer.setText("00:00");
+    }
+
 
     public void switchCamera(View v) {
         try {
@@ -252,6 +256,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void hideChat(View v) {
+        timer.setVisibility(View.VISIBLE);
+        amountSatoshi.setVisibility(View.VISIBLE);
         chatFragment.getView().setVisibility(View.GONE);
     }
 
@@ -287,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 packetSender.stoppedStreaming();
                 infoButton.setEnabled(true);
                 infoButton.setVisibility(View.VISIBLE);
+                stopSatoshiTimer();
                 stoppedUI();
             }
         });
