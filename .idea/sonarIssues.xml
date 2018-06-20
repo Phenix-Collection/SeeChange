@@ -93,6 +93,11 @@
             <set />
           </value>
         </entry>
+        <entry key="$PROJECT_DIR$/mobile/src/test/java/com/thecirkel/seechange/ChatArrayAdapterTest.java">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/mobile/src/test/java/com/thecirkel/seechange/ChatServiceTest.java">
           <value>
             <set />

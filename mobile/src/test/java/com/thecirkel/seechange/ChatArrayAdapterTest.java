@@ -37,17 +37,6 @@ public class ChatArrayAdapterTest {
     }
 
     @Test
-    public void adapterCreatesAView() {
-        View testView = mockChatArrayAdapter.getView(0, null, null);
-
-//        TextView userName = testView.findViewById(R.id.chatUser);
-//        TextView timestamp = testView.findViewById(R.id.chatTimestamp);
-//        TextView message = testView.findViewById(R.id.chatMessage);
-
-        Assert.assertNotNull("View is null.", testView);
-    }
-
-    @Test
     public void countMessagesInList() {
         messageList.add(testMessage1);
         messageList.add(testMessage2);

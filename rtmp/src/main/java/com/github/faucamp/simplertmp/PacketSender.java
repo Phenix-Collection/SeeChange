@@ -61,7 +61,7 @@ public class PacketSender {
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
-            socket = IO.socket("http://188.166.127.54:6969");
+            socket = IO.socket("http://188.166.127.54:3000");
             socket.connect();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -190,7 +190,7 @@ public class PacketSender {
     }
 
 
-    public static PacketSender getInstance() throws Exception {
+    public static PacketSender getInstance() {
         if (instance == null) {
             instance = new PacketSender();
         }
@@ -199,8 +199,22 @@ public class PacketSender {
 
     public void startSending(byte[] newPacket, RtmpPacket packet) {
         if (socket.connected()) {
+
+
+            try {
+                JSONObject json = new JSONObject();
+                json.put("absoluteMadTime", packet.getHeader().getAbsoluteTimestamp());
+                json.put("example", "This is a buffer example.".getBytes());
+                json.put("exampleHash",  toHexString(mac.doFinal("This is a buffer example.".getBytes())));
+                json.put("packet", newPacket);
+                json.put("packetlength", newPacket.length);
+                socket.emit("buffer", json);
+            } catch (Exception e) {
+
+            }
+
             final byte[] hash = mac.doFinal(newPacket);
-            sendToServer(toHexString(hash), packet);
+            sendToServer(toHexString(hash), packet, newPacket);
         }
     }
 
@@ -214,7 +228,7 @@ public class PacketSender {
         keySend = true;
     }
 
-    private void sendToServer(String hash, RtmpPacket packet) {
+    private void sendToServer(String hash, RtmpPacket packet, byte[] newPacket) {
         if (!keySend) {
             sendPublicKey(publicKey);
         }
