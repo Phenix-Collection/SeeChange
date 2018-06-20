@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +30,15 @@ import com.thecirkel.seechange.services.CertificateService;
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
+    // Satoshi counter attributes:
+    private TextView timer, amountSatoshi;
+    private Handler handler = new Handler();
+    private Runnable runnable;
+    private Thread timerRunnable;
+    private int counter = 0, satoshi = 0, Seconds, Minutes, MilliSeconds;
+    private long MillisecondTime, StartTime, TimeBuff, UpdateTime = 0L, delay = (1L*6000L);
+
+
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
 
@@ -85,12 +98,53 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         cameraPreview = findViewById(R.id.cameraView);
 
+        //Satoshi timer and amount:
+        timer = findViewById(R.id.timer);
+        amountSatoshi = findViewById(R.id.satoshiAmount);
+
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             camera = new RtmpCamera1(cameraPreview, this);
             cameraPreview.getHolder().addCallback(this);
         } else {
             requestPermissions();
         }
+
+        //Threads for Satoshi:
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                handler.postDelayed(this, delay);
+                if(counter == 0) {
+                    counter++;
+                }
+                else if(counter == 1) {
+                    satoshi = 1;
+                    counter++;
+                } else if (counter == 2){
+                    satoshi += counter;
+                    counter++;
+                } else {
+                    counter = counter * 2;
+                    satoshi += counter;
+                }
+                amountSatoshi.setText(satoshi + "S");
+            }
+        };
+
+        timerRunnable = new Thread() {
+            @Override
+            public void run() {
+                MillisecondTime = SystemClock.uptimeMillis() - StartTime;
+                UpdateTime = TimeBuff + MillisecondTime;
+                Seconds = (int) (UpdateTime / 1000);
+                Minutes = Seconds / 60;
+                Seconds = Seconds % 60;
+                MilliSeconds = (int) (UpdateTime % 1000);
+                timer.setText("" + Minutes + ":"
+                        + String.format("%02d", Seconds));
+                handler.postDelayed(this, 0);
+            }
+        };
     }
 
     public void requestPermissions(){
@@ -108,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }
         }
     };
+
 
     private void closeNow() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -155,6 +210,11 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 camera.startStream("rtmp://188.166.127.54/live/" + certificateService.getStreamkey());
                 infoButton.setEnabled(false);
                 infoButton.setVisibility(View.GONE);
+
+                //Satoshi:
+                handler.post(runnable);
+                StartTime = SystemClock.uptimeMillis();
+                timerRunnable.run();
             } else {
                 infoButton.setEnabled(true);
                 infoButton.setVisibility(View.VISIBLE);
@@ -166,6 +226,20 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             infoButton.setEnabled(true);
             infoButton.setVisibility(View.VISIBLE);
             camera.stopStream();
+
+            // Cancel satoshi counter and amount calculator:
+            timerRunnable.interrupt();
+            handler.removeCallbacks(timerRunnable);
+            counter = 0;
+            satoshi = 0;
+            amountSatoshi.setText("Satoshi");
+            MillisecondTime = 0L;
+            TimeBuff = 0L;
+            UpdateTime = 0L;
+            Seconds = 0;
+            Minutes = 0;
+            MilliSeconds = 0;
+            timer.setText("00:00");
         }
     }
 
