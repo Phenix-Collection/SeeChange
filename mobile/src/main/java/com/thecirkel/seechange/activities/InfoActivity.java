@@ -9,14 +9,15 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.thecirkel.seechange.R;
 import com.thecirkel.seechange.services.CertificateService;
+import com.thecirkel.seechange.services.UserDataGetTask;
+import com.thecirkel.seechangemodels.models.UserData;
 
-public class InfoActivity extends AppCompatActivity {
-
+public class InfoActivity extends AppCompatActivity implements UserDataGetTask.OnUserDataAvailable{
     private CertificateService certificateService;
     private ImageView closeInfo,avatar;
+    private String streamerkey;
     private TextView name,bio,satoshiAmount;
     private Integer testSatoshi = 12345;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,18 +25,14 @@ public class InfoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_info);
 
         certificateService = new CertificateService();
+        streamerkey = certificateService.getStreamkey();
+
+        getUserData("http://188.166.127.54:5555/api/getStreamer/" + streamerkey);
 
         avatar = findViewById(R.id.avatar);
-        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
-
         name = findViewById(R.id.name);
-        name.setText(certificateService.getStreamerName());
-
         bio = findViewById(R.id.shortBio);
-        bio.setText(certificateService.getShortbio());
-
         satoshiAmount = findViewById(R.id.satoshiAmount);
-        satoshiAmount.setText( "" + testSatoshi + " ㋛");
 
         closeInfo = findViewById(R.id.closeInfoButton);
         closeInfo.setOnClickListener(new View.OnClickListener() {
@@ -46,4 +43,17 @@ public class InfoActivity extends AppCompatActivity {
         });
     }
 
+    public void getUserData(String apiUrl) {
+        String[] urls = new String[]{apiUrl};
+
+        UserDataGetTask getdata = new UserDataGetTask(this);
+        getdata.execute(urls);
+    }
+
+    @Override
+    public void onUserDataAvailable(UserData userData) {
+        name.setText(userData.getUsername());
+        bio.setText(userData.getBio());
+        Picasso.get().load(userData.getAvatarurl()).into(avatar);
+    }
 }
