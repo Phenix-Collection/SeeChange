@@ -1,7 +1,6 @@
 package com.thecirkel.seechange.activities;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,7 +13,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,11 +24,6 @@ import com.thecirkel.seechange.R;
 import com.thecirkel.seechange.services.CertificateService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
     private RtmpCamera1 camera;
@@ -64,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         intent = new Intent(this,InfoActivity.class);
 
         cameraPreview = findViewById(R.id.cameraView);
+
         certificateService = new CertificateService();
 
         recordButton = findViewById(R.id.recordButton);
