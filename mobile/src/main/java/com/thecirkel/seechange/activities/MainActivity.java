@@ -152,9 +152,9 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
+                camera.startStream("rtmp://188.166.127.54/live/" + certificateService.getStreamkey());
                 infoButton.setEnabled(false);
                 infoButton.setVisibility(View.GONE);
-                camera.startStream("rtmp://188.166.127.54:1999/live/" + certificateService.getStreamkey());
             } else {
                 infoButton.setEnabled(true);
                 infoButton.setVisibility(View.VISIBLE);

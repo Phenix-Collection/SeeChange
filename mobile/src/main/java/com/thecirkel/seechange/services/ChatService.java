@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Observable;
 
 public class ChatService extends Observable {
-
     private static ChatService instance = null;
     private List<ChatMessage> messages = new ArrayList<>();
 
