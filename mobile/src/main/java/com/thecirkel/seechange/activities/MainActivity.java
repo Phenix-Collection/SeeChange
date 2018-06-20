@@ -3,6 +3,7 @@ package com.thecirkel.seechange.activities;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,10 +27,19 @@ import com.thecirkel.seechange.services.CertificateService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
+
     private Fragment chatFragment;
+    private ImageView infoButton;
+    private InfoActivity infoActivity;
+    private Intent intent;
 
     private TextView liveText;
     private ImageView recordButton, switchcameraButton;
@@ -49,9 +60,10 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             e.printStackTrace();
         }
 
+        infoActivity = new InfoActivity();
+        intent = new Intent(this,InfoActivity.class);
+
         cameraPreview = findViewById(R.id.cameraView);
-        camera = new RtmpCamera1(cameraPreview, this);
-        cameraPreview.getHolder().addCallback(this);
         certificateService = new CertificateService();
 
         recordButton = findViewById(R.id.recordButton);
@@ -68,6 +80,14 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         chatFragment = getFragmentManager().findFragmentById(R.id.chatFragment);
         chatFragment.getView().setVisibility(View.GONE);
+
+        infoButton = findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(intent);
+            }
+        });
 
         cameraPreview = findViewById(R.id.cameraView);
 
@@ -138,13 +158,19 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                     || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
+                infoButton.setEnabled(false);
+                infoButton.setVisibility(View.GONE);
                 camera.startStream("rtmp://188.166.127.54:1999/live/" + certificateService.getStreamkey());
             } else {
+                infoButton.setEnabled(true);
+                infoButton.setVisibility(View.VISIBLE);
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
             }
         } else {
             liveText.setVisibility(View.INVISIBLE);
+            infoButton.setEnabled(true);
+            infoButton.setVisibility(View.VISIBLE);
             camera.stopStream();
         }
     }
@@ -191,6 +217,8 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                         .show();
                 camera.stopStream();
                 packetSender.stoppedStreaming();
+                infoButton.setEnabled(true);
+                infoButton.setVisibility(View.VISIBLE);
                 stoppedUI();
             }
         });
