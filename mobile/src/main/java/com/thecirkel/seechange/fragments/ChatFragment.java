@@ -23,6 +23,7 @@ import com.thecirkel.seechangemodels.models.ChatMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.*;
 
 import io.socket.client.Socket;
@@ -52,20 +53,20 @@ public class ChatFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-            chatApplication = new ChatApplication();
-            certificateService = new CertificateService();
-            streamerName = certificateService.getStreamerName();
-            streamkey = certificateService.getStreamkey();
+        chatApplication = new ChatApplication();
+        certificateService = new CertificateService();
+        streamerName = certificateService.getStreamerName();
+        streamkey = certificateService.getStreamkey();
 
-            mSocket = chatApplication.getSocket();
-            mSocket.on(Socket.EVENT_CONNECT, onConnect);
-            mSocket.on(Socket.EVENT_DISCONNECT,onDisconnect);
-            mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-            mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
-            mSocket.on("chat_message", onNewMessage);
-            mSocket.on("update_followers", onUpdateFollowers);
+        mSocket = chatApplication.getSocket();
+        mSocket.on(Socket.EVENT_CONNECT, onConnect);
+        mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
+        mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+        mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        mSocket.on("chat_message", onNewMessage);
+        mSocket.on("update_followers", onUpdateFollowers);
 
-            mSocket.connect();
+        mSocket.connect();
 
     }
 
@@ -104,16 +105,20 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(!isConnected) {
+                    if (!isConnected) {
                         Log.i(TAG, "connected");
 
                         JSONObject data = new JSONObject();
                         try {
-                            data.put("room", streamkey);
+                            data.put("id", UUID.randomUUID());
+                            data.put("data",
+                                    new JSONObject().put("room", streamkey)
+                            );
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
+                        mSocket.emit("join_room", data);
                         mSocket.emit("join_room", data);
                         isConnected = true;
                         ConnectionError = false;
@@ -129,7 +134,7 @@ public class ChatFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(!ConnectionError){
+                    if (!ConnectionError) {
                         Log.e(TAG, "Error connecting");
                         Toast.makeText(getActivity().getApplicationContext(),
                                 R.string.error_connect, Toast.LENGTH_LONG).show();
@@ -160,11 +165,13 @@ public class ChatFragment extends Fragment {
                 @Override
                 public void run() {
                     JSONObject data = (JSONObject) args[0];
+
                     String message, username, timestamp;
                     try {
-                        message = data.getString("message").trim();
-                        username = data.getString("username");
-                        timestamp = data.getString("timestamp");
+                        JSONObject data2 = data.getJSONObject("data");
+                        message = data2.getString("message").trim();
+                        username = data2.getString("username");
+                        timestamp = data2.getString("timestamp");
                     } catch (JSONException e) {
                         Log.e(TAG, e.getMessage());
                         return;
@@ -185,7 +192,8 @@ public class ChatFragment extends Fragment {
                     JSONObject data = (JSONObject) args[0];
                     Integer followers;
                     try {
-                        followers = data.getInt("followers");
+                        JSONObject data2 = data.getJSONObject("data");
+                        followers = data2.getInt("followers");
                     } catch (JSONException e) {
                         Log.e(TAG, e.getMessage());
                         return;
@@ -240,9 +248,9 @@ public class ChatFragment extends Fragment {
         try {
             data2.put("message", message);
             data2.put("username", streamerName);
-            data2.put("room",  streamkey);
-            data.put("id",UUID.randomUUID());
-            data.put("data",data2);
+            data2.put("room", streamkey);
+            data.put("id", UUID.randomUUID());
+            data.put("data", data2);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -255,10 +263,23 @@ public class ChatFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
+        JSONObject data = new JSONObject();
+        try {
+            data.put("id", UUID.randomUUID());
+            data.put("data",
+                    new JSONObject().put("room", streamkey)
+            );
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        mSocket.emit("leave_room",data);
+        mSocket.emit("leave_room",data);
+
         mSocket.disconnect();
 
         mSocket.off(Socket.EVENT_CONNECT, onConnect);
-        mSocket.off(Socket.EVENT_DISCONNECT,onDisconnect);
+        mSocket.off(Socket.EVENT_DISCONNECT, onDisconnect);
         mSocket.off(Socket.EVENT_CONNECT_ERROR, onConnectError);
         mSocket.off(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
         mSocket.off("chat_message", onNewMessage);
