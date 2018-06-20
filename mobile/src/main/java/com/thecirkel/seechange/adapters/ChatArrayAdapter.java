@@ -1,17 +1,19 @@
 package com.thecirkel.seechange.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.thecirkel.seechange.R;
 import com.thecirkel.seechangemodels.models.ChatMessage;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 public class ChatArrayAdapter extends BaseAdapter {
@@ -57,7 +59,21 @@ public class ChatArrayAdapter extends BaseAdapter {
         }
 
         viewHolder.username.setText(messages.get(position).getUsername());
-        viewHolder.timestamp.setText(messages.get(position).getTimestamp());
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("H:mm:ss a");
+
+        String timestamp = messages.get(position).getTimestamp();
+        Date inputDate = null;
+
+        try {
+            inputDate = inputFormat.parse(timestamp);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        String outputDate = outputFormat.format(inputDate);
+
+        viewHolder.timestamp.setText(outputDate);
         viewHolder.message.setText(messages.get(position).getMessage());
 
         return view;
