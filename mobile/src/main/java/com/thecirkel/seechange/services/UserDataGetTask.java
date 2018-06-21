@@ -85,10 +85,12 @@ public class UserDataGetTask extends AsyncTask<String, Void, String> {
             String name = jsonObject.getString("name");
             String avatarurl = jsonObject.getString("avatar_source");
             String bio = jsonObject.getString("short_bio");
+            Integer satoshi = jsonObject.getInt("satoshi");
 
             ud.setUsername(name);
             ud.setAvatarurl(avatarurl);
             ud.setBio(bio);
+            ud.setSatoshi(satoshi);
 
             ouda.onUserDataAvailable(ud);
         } catch (JSONException ex) {

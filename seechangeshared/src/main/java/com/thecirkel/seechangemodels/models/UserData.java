@@ -3,6 +3,15 @@ package com.thecirkel.seechangemodels.models;
 public class UserData {
 
     private String username, bio, avatarurl;
+    private Integer satoshi;
+
+    public Integer getSatoshi() {
+        return satoshi;
+    }
+
+    public void setSatoshi(Integer satoshi) {
+        this.satoshi = satoshi;
+    }
 
     public String getUsername() {
         return username;
