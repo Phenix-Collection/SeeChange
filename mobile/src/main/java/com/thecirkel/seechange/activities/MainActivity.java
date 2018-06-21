@@ -6,13 +6,17 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,16 +26,25 @@ import com.pedro.encoder.input.video.CameraOpenException;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
 import com.thecirkel.seechange.R;
 import com.thecirkel.seechange.services.CertificateService;
+import com.thecirkel.seechange.services.SatoshiService;
 
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback, ConnectCheckerRtmp {
+    // Satoshi counter attributes:
+    private TextView timer, amountSatoshi;
+    private Handler handler = new Handler();
+    private Thread timerRunnable;
+    private int Seconds, Minutes, MilliSeconds;
+    private long MillisecondTime, StartTime, TimeBuff, UpdateTime = 0L;
+    private Boolean isStreaming = false;
+
+
     private RtmpCamera1 camera;
     private SurfaceView cameraPreview;
 
     private Fragment chatFragment;
     private ImageView infoButton;
-    private InfoActivity infoActivity;
     private Intent intent;
 
     private TextView liveText;
@@ -53,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             e.printStackTrace();
         }
 
-        infoActivity = new InfoActivity();
         intent = new Intent(this,InfoActivity.class);
 
         cameraPreview = findViewById(R.id.cameraView);
@@ -85,12 +97,30 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         cameraPreview = findViewById(R.id.cameraView);
 
+        timer = findViewById(R.id.timer);
+
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             camera = new RtmpCamera1(cameraPreview, this);
             cameraPreview.getHolder().addCallback(this);
         } else {
             requestPermissions();
         }
+
+        timerRunnable = new Thread() {
+            @Override
+            public void run() {
+                if(isStreaming){
+                    MillisecondTime = SystemClock.uptimeMillis() - StartTime;
+                    UpdateTime = TimeBuff + MillisecondTime;
+                    Seconds = (int) (UpdateTime / 1000);
+                    Minutes = Seconds / 60;
+                    Seconds = Seconds % 60;
+                    MilliSeconds = (int) (UpdateTime % 1000);
+                    timer.setText("" + Minutes + ":" + String.format("%02d", Seconds));
+                    handler.postDelayed(this, 0);
+                }
+            }
+        };
     }
 
     public void requestPermissions(){
@@ -108,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             }
         }
     };
+
 
     private void closeNow() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -143,21 +174,22 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
 
     public void goToChat(View v) {
+        timer.setVisibility(View.GONE);
         chatFragment.getView().setVisibility(View.VISIBLE);
     }
 
     public void startStopCamera(View v) {
         if (!camera.isStreaming()) {
-            if (camera.isRecording()
-                    || camera.prepareAudio() && camera.prepareVideo()) {
+            if (camera.isRecording() || camera.prepareAudio() && camera.prepareVideo()) {
                 liveText.setText("Starting stream...");
                 liveText.setVisibility(View.VISIBLE);
-                camera.startStream("rtmp://188.166.127.54/live/" + certificateService.getStreamkey());
+                camera.startStream("rtmp://167.99.42.8/live/" + certificateService.getStreamkey());
                 infoButton.setEnabled(false);
                 infoButton.setVisibility(View.GONE);
+                startTimer();
+
             } else {
-                infoButton.setEnabled(true);
-                infoButton.setVisibility(View.VISIBLE);
+                stopTimer();
                 Toast.makeText(this, "Error preparing stream, This device cant do it",
                         Toast.LENGTH_SHORT).show();
             }
@@ -166,8 +198,36 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
             infoButton.setEnabled(true);
             infoButton.setVisibility(View.VISIBLE);
             camera.stopStream();
+            stopTimer();
+
         }
     }
+
+    public void startTimer(){
+        isStreaming = true;
+        MillisecondTime = 0L;
+        TimeBuff = 0L;
+        UpdateTime = 0L;
+        Seconds = 0;
+        Minutes = 0;
+        MilliSeconds = 0;
+        timer.setVisibility(View.VISIBLE);
+        StartTime = SystemClock.uptimeMillis();
+        timerRunnable.run();
+    }
+
+    public void stopTimer(){
+        MillisecondTime = 0L;
+        TimeBuff = 0L;
+        UpdateTime = 0L;
+        Seconds = 0;
+        Minutes = 0;
+        MilliSeconds = 0;
+        isStreaming = false;
+        timer.setVisibility(View.GONE);
+        timer.setText("00:00");
+    }
+
 
     public void switchCamera(View v) {
         try {
@@ -178,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     }
 
     public void hideChat(View v) {
+        timer.setVisibility(View.VISIBLE);
         chatFragment.getView().setVisibility(View.GONE);
     }
 

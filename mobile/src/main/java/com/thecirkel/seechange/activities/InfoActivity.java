@@ -27,8 +27,6 @@ public class InfoActivity extends AppCompatActivity implements UserDataGetTask.O
         certificateService = new CertificateService();
         streamerkey = certificateService.getStreamkey();
 
-        getUserData("http://188.166.127.54:5555/api/getStreamer/" + streamerkey);
-
         avatar = findViewById(R.id.avatar);
         name = findViewById(R.id.name);
         bio = findViewById(R.id.shortBio);
@@ -41,7 +39,18 @@ public class InfoActivity extends AppCompatActivity implements UserDataGetTask.O
                 finish();
             }
         });
+
+        getUserDataOutCertificate();
+        //getUserData("http://188.166.127.54:5555/api/getStreamer/" + streamerkey);
+
     }
+
+    public void getUserDataOutCertificate(){
+        name.setText(certificateService.getStreamerName());
+        bio.setText(certificateService.getShortbio());
+        Picasso.get().load(certificateService.getAvatarsource()).into(avatar);
+    }
+
 
     public void getUserData(String apiUrl) {
         String[] urls = new String[]{apiUrl};
@@ -55,5 +64,6 @@ public class InfoActivity extends AppCompatActivity implements UserDataGetTask.O
         name.setText(userData.getUsername());
         bio.setText(userData.getBio());
         Picasso.get().load(userData.getAvatarurl()).into(avatar);
+        satoshiAmount.setText(userData.getSatoshi());
     }
 }

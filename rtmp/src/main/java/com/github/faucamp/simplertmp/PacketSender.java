@@ -61,7 +61,7 @@ public class PacketSender {
             key = new SecretKeySpec("SUPERSECRETHASHTHING".getBytes(), "HmacSHA256");
             mac = Mac.getInstance(key.getAlgorithm());
             mac.init(key);
-            socket = IO.socket("http://188.166.127.54:3000");
+            socket = IO.socket("http://167.99.42.8:3000");
             socket.connect();
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -120,7 +120,7 @@ public class PacketSender {
 
             String certificate = "{" +
                     " \"name\": \"" + cert.get("name") +
-                    "\", \"short_bio\": \"" + cert.get("short_bio") +
+                    "\", \"short_bio\": \"" + cert.get("short_bio").toString().replace("\"","") +
                     "\", \"stream_key\": \"" + cert.get("stream_key") +
                     "\", \"avatar_source\": \"" + cert.get("avatar_source") +
                     "\"}";
