@@ -120,7 +120,7 @@ public class PacketSender {
 
             String certificate = "{" +
                     " \"name\": \"" + cert.get("name") +
-                    "\", \"short_bio\": \"" + cert.get("short_bio") +
+                    "\", \"short_bio\": \"" + cert.get("short_bio").toString().replace("\"","") +
                     "\", \"stream_key\": \"" + cert.get("stream_key") +
                     "\", \"avatar_source\": \"" + cert.get("avatar_source") +
                     "\"}";

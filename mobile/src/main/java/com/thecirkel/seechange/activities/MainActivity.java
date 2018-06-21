@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
     private PacketSender packetSender;
 
     private CertificateService certificateService;
-    private SatoshiService satoshiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
         cameraPreview = findViewById(R.id.cameraView);
 
         certificateService = new CertificateService();
-        //satoshiService = new SatoshiService(this);
 
         recordButton = findViewById(R.id.recordButton);
         switchcameraButton = findViewById(R.id.switchCameraButton);
@@ -99,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
         cameraPreview = findViewById(R.id.cameraView);
 
-        //Satoshi timer and amount:
         timer = findViewById(R.id.timer);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
@@ -178,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     public void goToChat(View v) {
         timer.setVisibility(View.GONE);
-        amountSatoshi.setVisibility(View.GONE);
         chatFragment.getView().setVisibility(View.VISIBLE);
     }
 
@@ -243,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
 
     public void hideChat(View v) {
         timer.setVisibility(View.VISIBLE);
-        amountSatoshi.setVisibility(View.VISIBLE);
         chatFragment.getView().setVisibility(View.GONE);
     }
 
@@ -279,7 +274,6 @@ public class MainActivity extends AppCompatActivity implements SurfaceHolder.Cal
                 packetSender.stoppedStreaming();
                 infoButton.setEnabled(true);
                 infoButton.setVisibility(View.VISIBLE);
-                //stopSatoshiTimer();
                 stoppedUI();
             }
         });
